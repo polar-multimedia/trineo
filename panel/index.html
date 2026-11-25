@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel · Seguimiento de cotizaciones</title>
+<link rel="icon" href="../shared/logo.svg">
+<style>
+@font-face{font-family:Manrope;src:url(../shared/manrope-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Manrope;src:url(../shared/manrope-latin-700-normal.woff2);font-weight:700}
+@font-face{font-family:Manrope;src:url(../shared/manrope-latin-800-normal.woff2);font-weight:800}
+:root{--teal:#4ECBCA;--tealD:#1F9C9B;--mag:#E0179D;--navy:#1A3A5C;--ink:#22313F;--mute:#5F6B78;--line:rgba(26,58,92,.12)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Manrope;font-size:14px;color:var(--ink);background:#F3FAFB url(../shared/ice.svg) center/cover fixed;min-height:100vh}
+main{max-width:1040px;margin:0 auto;padding:28px 20px 40px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+header img{height:40px}
+h1{font-weight:800;font-size:20px;color:var(--navy);margin:0}
+.sub{color:var(--mute);font-size:13px}
+.card{background:rgba(255,255,255,.8);border:1px solid #fff;border-radius:16px;box-shadow:0 10px 30px rgba(26,58,92,.06);padding:18px 20px;margin-bottom:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi .n{font-weight:800;font-size:24px;color:var(--tealD)} .kpi .l{font-size:12px;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+td b{color:var(--navy)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin:2px 4px 0 0}
+.ok{background:rgba(31,156,155,.12);color:var(--tealD)} .no{background:rgba(26,58,92,.07);color:var(--mute)}
+.warn{background:rgba(224,23,157,.1);color:var(--mag)}
+.btn{font-family:inherit;font-weight:800;font-size:13px;color:#fff;border:0;padding:10px 18px;border-radius:10px;background:linear-gradient(110deg,var(--navy),var(--tealD));cursor:pointer}
+.links code{font-size:12px;background:rgba(26,58,92,.06);padding:2px 6px;border-radius:6px;word-break:break-all}
+.feed div{padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.feed span{color:var(--mute)}
+#msg{color:var(--mute)}
+@media (max-width:720px){.kpis{grid-template-columns:1fr 1fr} .hide-m{display:none}}
+</style></head>
+<body><main>
+<header>
+  <div><h1>Seguimiento de cotizaciones</h1><div class="sub">Cotizaciones de Polar</div></div>
+  <img src="../shared/logo.svg" alt="">
+</header>
+<div id="login" class="card"><p id="msg">Inicia sesión con la cuenta autorizada para ver el seguimiento.</p><button class="btn" id="go">Entrar con Google</button></div>
+<div id="app" hidden>
+  <div class="card"><label style="font-size:12px;color:var(--mute)">Cotización</label><br><select id="sel" style="font-family:inherit;font-size:15px;font-weight:700;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:4px;width:100%"></select></div>
+  <div class="kpis">
+    <div class="card kpi"><div class="n" id="k1">0</div><div class="l">destinatarios que abrieron</div></div>
+    <div class="card kpi"><div class="n" id="k2">0</div><div class="l">aperturas en total</div></div>
+    <div class="card kpi"><div class="n" id="k3">0</div><div class="l">descargas del PDF</div></div>
+    <div class="card kpi"><div class="n" id="k4">0 min</div><div class="l">tiempo total de lectura</div></div>
+  </div>
+  <div class="card"><table><thead><tr><th>Destinatario</th><th>Aperturas</th><th class="hide-m">Primera / última</th><th>Lectura</th><th>Descarga</th><th class="hide-m">Dispositivos</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="card"><b style="color:var(--navy)">Actividad reciente</b><div class="feed" id="feed"></div></div>
+  <div class="card links"><b style="color:var(--navy)">Links por destinatario</b><div class="sub">Escribe el nombre de cada persona; se guarda en Firebase, no en el repositorio.</div><div id="links"></div></div>
+</div>
+</main>
+<script type="module">
+import { FIREBASE, ADMIN } from "../shared/firebase.js";
+import { COTIZACIONES } from "../cotizaciones.js";
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const root = location.href.replace(/panel\/.*$/, "");
+const docs = Object.keys(COTIZACIONES);
+$("sel").innerHTML = docs.map(d => `<option value="${d}">${COTIZACIONES[d].titulo}</option>`).join("");
+let current = docs[0], unsub = null, db, ref, onValue;
+let DIR = {};
+function showLinks() {
+  const codes = COTIZACIONES[current].codigos;
+  $("links").innerHTML = codes.map(c => `<p><input data-c="${c}" placeholder="Nombre del destinatario" value="${esc((DIR[c]||{}).name||"")}" style="font-family:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:min(320px,100%)"><br><code>${root}${current}/?c=${c}</code></p>`).join("");
+  $("links").querySelectorAll("input").forEach(i => i.onchange = () => saveName && saveName(i.dataset.c, i.value.trim()));
+}
+let saveName = null;
+showLinks();
+if (FIREBASE.databaseURL.includes("PENDIENTE")) { $("msg").textContent = "Falta configurar Firebase en shared/firebase.js."; $("go").hidden = true; }
+else {
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  ({ getDatabase: db, ref, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"));
+  const app = initializeApp(FIREBASE), auth = getAuth(app); db = db(app);
+  $("go").onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+  const { set } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+  saveName = (c, name) => set(ref(db, `directorio/${current}/${c}/name`), name);
+  let unsubDir = null;
+  const watch = () => {
+    if (unsub) unsub(); if (unsubDir) unsubDir();
+    let last = {};
+    unsubDir = onValue(ref(db, `directorio/${current}`), snap => { DIR = snap.val() || {}; showLinks(); render(last); });
+    unsub = onValue(ref(db, `tracking/${current}`), snap => { last = snap.val() || {}; render(last); });
+  };
+  $("sel").onchange = e => { current = e.target.value; showLinks(); watch(); };
+  onAuthStateChanged(auth, u => {
+    if (!u) return;
+    if (u.email !== ADMIN) { $("msg").textContent = "Esta cuenta no tiene acceso al panel."; return; }
+    $("login").hidden = true; $("app").hidden = false; watch();
+  });
+}
+const fmt = t => t ? new Date(t).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+const mins = s => s < 60 ? `${s} s` : `${Math.round(s / 60)} min`;
+function render(data) {
+  const RECIPIENTS = Object.fromEntries(COTIZACIONES[current].codigos.map(c => [c, { name: (DIR[c] || {}).name || `Código ${c}`, email: (DIR[c] || {}).email || "" }]));
+  const visits = data.visits || {}, downloads = data.downloads || {};
+  const codes = new Set([...Object.keys(RECIPIENTS), ...Object.keys(visits), ...Object.keys(downloads)]);
+  let opened = 0, totalOpens = 0, totalDl = 0, totalSecs = 0; const feed = [];
+  const rows = [...codes].map(c => {
+    const r = RECIPIENTS[c] || { name: c === "sin-codigo" ? "Sin código (link genérico)" : `Código ${esc(c)}` };
+    const v = Object.values(visits[c] || {}), d = Object.values(downloads[c] || {});
+    const secs = v.reduce((a, x) => a + (Number(x.secs) || 0), 0), devs = new Set(v.map(x => x.device).concat(d.map(x => x.device)));
+    const secSeen = new Set(v.flatMap(x => String(x.sections || "").split(",").filter(Boolean)));
+    if (v.length) opened++; totalOpens += v.length; totalDl += d.length; totalSecs += secs;
+    v.forEach(x => feed.push({ t: x.start, txt: `<b>${esc(r.name)}</b> abrió la cotización` }));
+    d.forEach(x => feed.push({ t: x.ts, txt: `<b>${esc(r.name)}</b> descargó el PDF` }));
+    const first = Math.min(...v.map(x => x.start)), last = Math.max(...v.map(x => x.last || x.start));
+    return `<tr><td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.email || "")}</span></td>
+      <td>${v.length ? `<span class="tag ok">${v.length}</span>` : `<span class="tag no">Sin abrir</span>`}</td>
+      <td class="hide-m">${v.length ? `${fmt(first)}<br><span class="sub">${fmt(last)}</span>` : "—"}</td>
+      <td>${v.length ? `${mins(secs)}<br><span class="sub">${secSeen.size} de 5 secciones</span>` : "—"}</td>
+      <td>${d.length ? `<span class="tag ok">Sí · ${fmt(Math.max(...d.map(x => x.ts)))}</span>` : `<span class="tag no">No</span>`}</td>
+      <td class="hide-m">${devs.size || "—"} ${devs.size > 1 ? `<span class="tag warn">Posible reenvío</span>` : ""}</td></tr>`;
+  });
+  $("rows").innerHTML = rows.join("");
+  $("k1").textContent = opened; $("k2").textContent = totalOpens; $("k3").textContent = totalDl; $("k4").textContent = mins(totalSecs);
+  $("feed").innerHTML = feed.sort((a, b) => b.t - a.t).slice(0, 20).map(f => `<div>${f.txt} <span>· ${fmt(f.t)}</span></div>`).join("") || `<div><span>Aún no hay actividad.</span></div>`;
+}
+</script>
+</body></html>

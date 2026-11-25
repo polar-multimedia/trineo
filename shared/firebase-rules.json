@@ -1,0 +1,21 @@
+{
+  "rules": {
+    "tracking": {
+      "$doc": {
+        ".read": "auth != null && auth.token.email === 'carpinteyro@polarmultimedia.com'",
+        "visits": { "$code": { "$id": {
+          ".write": "!data.exists() || data.child('device').val() === newData.child('device').val()",
+          ".validate": "newData.hasChildren(['start','device'])"
+        } } },
+        "downloads": { "$code": { "$id": {
+          ".write": "!data.exists()",
+          ".validate": "newData.hasChildren(['ts','device'])"
+        } } }
+      }
+    },
+    "directorio": {
+      ".read": "auth != null && auth.token.email === 'carpinteyro@polarmultimedia.com'",
+      ".write": "auth != null && auth.token.email === 'carpinteyro@polarmultimedia.com'"
+    }
+  }
+}
