@@ -134,7 +134,7 @@ const docs = Object.keys(COTIZACIONES);
 const fmt = t => t ? new Date(t).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
 const mins = s => s < 60 ? `${Math.round(s)} s` : `${Math.round(s / 60)} min`;
 const ago = t => { if (!t) return "—"; const m = (Date.now() - t) / 60000; return m < 60 ? `hace ${Math.max(1, Math.round(m))} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} d`; };
-const money = n => "$" + Number(n || 0).toLocaleString("en-US");
+const money = n => "$" + Number(n || 0).toLocaleString("en-US") + " MXN";
 const toast = t => { $("toast").textContent = t; $("toast").classList.add("on"); setTimeout(() => $("toast").classList.remove("on"), 1800); };
 const dev = ua => /iPhone|Android.+Mobile/i.test(ua || "") ? "Celular" : /iPad|Tablet/i.test(ua || "") ? "Tableta" : "Computadora";
 let current = docs[0], DIR = {}, TRK = {}, SEG = {}, api = null, lastRows = [];

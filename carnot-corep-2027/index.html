@@ -155,6 +155,24 @@ main{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:10px 24px
 .h-para i{font-style:normal;font-size:14px;font-weight:700;color:#E3F4F6}
 .h-para em{font-style:normal;font-size:12px;font-weight:700;color:#A9C4CA;margin-top:4px}
 .meta .at{font-size:7pt;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tealD)}
+.hero-wrap{position:relative;z-index:2;height:175vh;height:175svh}
+.hero-wrap .hero{position:sticky;top:0;height:100vh;height:100svh;min-height:0;max-width:none;padding:0;--a:0;--s:0}
+.hero-in{position:relative;max-width:980px;width:100%;margin:0 auto;padding:40px 28px 80px;transform:scale(calc(.985 + .015*var(--s)))}
+.ice{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ice-p{position:absolute;inset:-2% -4%;opacity:calc(1 - var(--s));backdrop-filter:blur(calc((1 - var(--a))*11px)) brightness(1.06);-webkit-backdrop-filter:blur(calc((1 - var(--a))*11px)) brightness(1.06);
+ background:radial-gradient(60% 45% at 0 0,rgba(255,255,255,.55),transparent 70%),radial-gradient(55% 40% at 100% 0,rgba(255,255,255,.42),transparent 70%),radial-gradient(60% 45% at 100% 100%,rgba(255,255,255,.5),transparent 70%),radial-gradient(55% 40% at 0 100%,rgba(255,255,255,.4),transparent 70%),linear-gradient(rgba(190,232,240,.10),rgba(190,232,240,.06));will-change:transform,opacity}
+.ice-p::before{content:"";position:absolute;inset:0;background:url(assets/ice.svg) center/cover;mix-blend-mode:soft-light;opacity:.55}
+.ice-p::after{content:"";position:absolute;inset:0;background:url(assets/frost.svg) center/520px;opacity:.35}
+.ice-l{clip-path:polygon(0 0,54% 0,50% 18%,56% 34%,47% 52%,53% 70%,45% 86%,49% 100%,0 100%);transform:translate3d(calc(var(--s)*-9%),0,0) rotate(calc(var(--s)*-1.2deg))}
+.ice-r{clip-path:polygon(54% 0,100% 0,100% 100%,49% 100%,45% 86%,53% 70%,47% 52%,56% 34%,50% 18%);transform:translate3d(calc(var(--s)*9%),0,0) rotate(calc(var(--s)*1.2deg))}
+.crack{position:absolute;inset:0;width:100%;height:100%;opacity:calc(1 - var(--s)*1.6)}
+.crack path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:calc(1 - var(--a))}
+.c-line{stroke:#E9FFFE;stroke-width:1.6px}
+.c-b{stroke-width:1px;stroke-dashoffset:calc(1 - max(0,var(--a)*2 - 1))!important;opacity:.8}
+.c-glow{stroke:#4ECBCA;stroke-width:calc(10px + var(--s)*60px);filter:blur(10px);opacity:.75}
+.h-scroll{z-index:3;opacity:calc(1 - var(--s)*2)}
+@media (max-width:720px){.hero-wrap{height:160svh}.hero-in{padding:30px 20px 80px}}
+@media (prefers-reduced-motion:reduce){.hero-wrap{height:auto}.hero-wrap .hero{position:relative;height:auto;min-height:92svh}.ice{display:none}}
 @keyframes rise{to{opacity:1;transform:none;filter:none}}
 @keyframes sweep{to{background-position:100% 0}}
 @keyframes wheel{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
@@ -168,15 +186,24 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 </style>
 <link rel="stylesheet" href="../shared/polar-fx.css"></head>
 <body>
-<header class="hero">
+<div class="hero-wrap"><header class="hero" id="hero">
   <div class="hero-in">
     <div class="h-para"><span>Cotización preparada para</span><b id="para-nombre">Carnot Laboratorios</b><i id="para-cargo">Gerencia Nacional de Ventas · Portafolio SNC</i><em>25 de noviembre de 2026 · Vigencia 30 días · Confidencial</em></div>
-    <h1 class="h-title"><span>Cada visita,</span> <span>preparada</span> <span>y diferente.</span></h1>
-    <p class="h-lead">Co-Rep es un copiloto con IA que prepara la visita antes y la registra después, con el contenido aprobado de las siete marcas.</p>
-    <div class="h-cta"><a class="btn glow" href="#planes">Ver la propuesta</a><span>$37,500 /mes + IVA · usuarios ilimitados</span></div>
+    <h1 class="h-title"><span>Que ninguna visita</span> <span>se parezca</span> <span>a la anterior.</span></h1>
+    <p class="h-lead">Co-Rep es el copiloto con IA que prepara cada visita antes y la registra después, con el contenido aprobado de las siete marcas.</p>
+    <div class="h-cta"><a class="btn glow" href="#planes">Ver la propuesta</a><span>$450,000 MXN + IVA · paquete anual · usuarios ilimitados</span></div>
   </div>
   <a class="h-scroll" href="#planes" aria-label="Bajar a la propuesta"><i></i></a>
-</header>
+  <div class="ice" aria-hidden="true">
+    <div class="ice-p ice-l"></div><div class="ice-p ice-r"></div>
+    <svg class="crack" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path class="c-glow" pathLength="1" d="M54 0 L50 18 L56 34 L47 52 L53 70 L45 86 L49 100"/>
+      <path class="c-line" pathLength="1" d="M54 0 L50 18 L56 34 L47 52 L53 70 L45 86 L49 100"/>
+      <path class="c-line c-b" pathLength="1" d="M56 34 L63 39 L66 47"/>
+      <path class="c-line c-b" pathLength="1" d="M47 52 L40 57 L38 66"/>
+    </svg>
+  </div>
+</header></div>
 <main id="planes">
 <section class="sheet" data-reveal>
 
@@ -212,8 +239,8 @@ footer.site .foot{background:rgba(250,253,254,.93)}
   <div class="plan pro" data-tilt style="border-radius:14px"><div class="frost" aria-hidden="true"></div>
     <span class="pill b-grad">Recomendado · Su paquete</span>
     <div class="name">Co-Rep Polar Edition</div><div class="tag">Brief + mejoras de Polar</div>
-    <div class="price">$37,500 <small>/mes</small></div>
-    <div class="bill">Facturación anual de $450,000 + IVA</div>
+    <div class="price">$450,000 <small>MXN + IVA</small></div>
+    <div class="bill">Paquete anual · pesos mexicanos</div>
     <ul>
       <li class="more">Todo lo de Co-Rep Brief, más:</li>
       <li>Kit de visita visual en web app</li>
@@ -225,7 +252,7 @@ footer.site .foot{background:rgba(250,253,254,.93)}
   </div>
 </div>
 <div class="cta"><a id="dl" class="btn" href="assets/Cotizacion-Carnot-Co-Rep-2027.pdf" download>Descargar PDF</a><span>Versión para guardar o imprimir</span></div>
-<p class="note">Precios en pesos mexicanos más IVA. Compromiso de 12 meses.</p>
+<p class="note">Precios en pesos mexicanos (MXN) más IVA. Compromiso de 12 meses.</p>
 
 <!-- PÁGINA 2 -->
 </section><section class="sheet" data-reveal>
@@ -238,15 +265,15 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 <tr><td class="k">Piloto y despliegue</td><td>Arranque con un grupo de representantes, ajustes y despliegue al portafolio completo, con capacitación.</td><td class="r inc">Incluido</td></tr>
 <tr><td class="k">Operación y soporte 12 meses</td><td>Infraestructura, mensajería, IA, actualización de la biblioteca, soporte y reporte mensual de uso.</td><td class="r inc">Incluido</td></tr>
 </table></div>
-<div class="total"><div><div class="t1">Paquete anual Co-Rep Polar Edition 2027</div><div class="t2">Equivale a 12 pagos mensuales de $37,500</div></div><div class="amt">$450,000</div></div>
-<div class="sums"><span>IVA 16% <b>$72,000</b></span><span>Total con IVA <b>$522,000</b></span></div>
+<div class="total"><div><div class="t1">Paquete anual Co-Rep Polar Edition 2027</div><div class="t2">Precio total en pesos mexicanos (MXN), antes de IVA</div></div><div class="amt">$450,000 MXN</div></div>
+<div class="sums"><span>IVA 16% <b>$72,000 MXN</b></span><span>Total con IVA <b>$522,000 MXN</b></span></div>
 
 <h2>Capacidad incluida</h2>
 <div class="glass tbl"><table>
 <tr><td class="k">Usuarios</td><td>Ilimitados: representantes, gerentes distritales y administradores. Carnot da de alta a quien necesite sin costo adicional.</td></tr>
 <tr><td class="k">Bolsa anual</td><td>240,000 interacciones al año, unas 1,000 por día hábil. Equivale a cerca de 120,000 visitas preparadas y registradas.</td></tr>
 <tr><td class="k">Canales</td><td>WhatsApp y web app, conectados a la misma inteligencia y al mismo historial.</td></tr>
-<tr><td class="k">Bolsa adicional</td><td>20,000 interacciones por $20,000 + IVA, solo si se agota la bolsa anual.</td></tr>
+<tr><td class="k">Bolsa adicional</td><td>20,000 interacciones por $20,000 MXN + IVA, solo si se agota la bolsa anual.</td></tr>
 </table></div>
 
 <!-- PÁGINA 3 -->
@@ -312,8 +339,8 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 </section><section class="sheet" data-reveal>
 <h2>Condiciones</h2>
 <ul class="b">
-<li>Precios en pesos mexicanos más IVA. Vigencia de la cotización: 30 días.</li>
-<li>Paquete anual con compromiso de 12 meses, pagadero en una exhibición o en 12 mensualidades de $37,500 + IVA.</li>
+<li>Todos los precios están en pesos mexicanos (MXN) más IVA. Vigencia de la cotización: 30 días.</li>
+<li>Paquete anual con compromiso de 12 meses.</li>
 <li>La bolsa de interacciones vence a los 12 meses; lo que no se use no se acumula.</li>
 <li>El número de WhatsApp se da de alta en la cuenta empresarial de Meta de Carnot, con Polar como administrador. El número es de Carnot desde el primer día.</li>
 <li>El contenido clínico lo aprueba Gerencia Médica de Carnot. Los datos de la auditoría los proporciona Carnot, que confirma contar con la licencia para compartirlos.</li>
@@ -341,7 +368,7 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 <tr><td><b>Biblioteca navegable por marca</b></td><td class="dash">—</td><td class="pcol"><span class="ck"></span></td></tr>
 <tr><td><b>Videos y archivos sin el límite de WhatsApp</b></td><td class="dash">—</td><td class="pcol"><span class="ck"></span></td></tr>
 <tr><td><b>Consultas en la web app sin consumir la bolsa</b></td><td class="dash">—</td><td class="pcol"><span class="ck"></span></td></tr>
-<tr><td><b>Inversión anual</b></td><td class="mute">Integrado</td><td class="pcol"><b style="color:var(--mag)">$450,000 + IVA</b></td></tr>
+<tr><td><b>Inversión anual</b></td><td class="mute">Integrado</td><td class="pcol"><b style="color:var(--mag)">$450,000 MXN + IVA</b></td></tr>
 </table></div>
 </div>
 
@@ -369,6 +396,14 @@ if(c){const get=f=>fetch(`${FIREBASE.databaseURL}/trineo/directorio/${doc}/${c}/
   const cargo=(typeof k==="string"&&k.trim())?k.trim()+" · Carnot Laboratorios":"Carnot Laboratorios · Portafolio SNC";
   ["para-cargo","para-cargo2"].forEach(i=>document.getElementById(i).textContent=cargo);
   document.title="Co-Rep · Cotización para "+n.trim();}}
+</script>
+<script>
+(function(){var h=document.getElementById("hero");if(!h||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ var a=0,t0=null;function auto(now){if(t0===null)t0=now+700;var p=Math.min(1,Math.max(0,(now-t0)/2600));a=1-Math.pow(1-p,3);h.style.setProperty("--a",a.toFixed(4));if(p<1)requestAnimationFrame(auto);}
+ requestAnimationFrame(auto);
+ var tick=false;function sc(){tick=false;var w=h.parentNode,d=w.offsetHeight-innerHeight,s=Math.min(1,Math.max(0,(scrollY-w.offsetTop)/(d*.92)));s=s*s*(3-2*s);h.style.setProperty("--s",s.toFixed(4));}
+ addEventListener("scroll",function(){if(!tick){tick=true;requestAnimationFrame(sc);}},{passive:true});addEventListener("resize",sc);sc();
+})();
 </script>
 <script type="module" src="../shared/polar-fx.js"></script>
 <script type="module" src="../shared/track.js"></script>

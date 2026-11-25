@@ -7,7 +7,7 @@ export const COTIZACIONES = {
     cliente: "Carnot Laboratorios",
     proyecto: "Co-Rep Polar Edition",
     monto: 450000,
-    nota: "$37,500 al mes + IVA · paquete anual",
+    nota: "Paquete anual · pesos mexicanos (MXN) más IVA",
     limite: "2026-11-30",
     pdf: "assets/Cotizacion-Carnot-Co-Rep-2027.pdf",
     secciones: ["Planes", "Inversión y capacidad", "Cómo funciona", "Interacciones y calendario", "Condiciones"],
