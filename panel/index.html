@@ -54,6 +54,10 @@ label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-tra
 .feed div,.notes div{padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 .feed span,.notes span{color:var(--mute);font-size:12px}
 [hidden]{display:none!important}
+.fold summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;list-style:none}
+.fold summary::-webkit-details-marker{display:none}
+.fold .more{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-weight:800;color:#fff}
+.fold[open] .more{font-size:0}.fold[open] .more::after{content:"Ocultar";font-size:12.5px}
 .tip{display:block;padding:10px 12px;border-radius:12px;background:rgba(224,23,157,.12);border:1px solid rgba(224,23,157,.3);margin-bottom:8px;font-size:13px}
 .tip.calm{background:rgba(78,203,202,.1);border-color:rgba(78,203,202,.3)}
 iframe{width:100%;height:560px;border:0;border-radius:14px;background:#06111d}
@@ -107,11 +111,12 @@ code{font-size:11.5px;background:rgba(255,255,255,.08);padding:2px 6px;border-ra
     <div class="card"><h2>Secciones más leídas</h2><div id="bars"></div></div>
   </div>
 
-  <div class="card" style="margin-bottom:16px">
-    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Destinatarios</h2><button class="btn ghost sm" id="csv">Exportar a Excel (CSV)</button></div>
+  <details class="card fold" style="margin-bottom:16px">
+    <summary><h2 style="margin:0">Destinatarios y ligas <span class="sub" id="pcount" style="font-weight:700"></span></h2><span class="sub more">Mostrar</span></summary>
+    <div class="row" style="justify-content:flex-end;margin:10px 0 6px"><button class="btn ghost sm" id="csv">Exportar a Excel (CSV)</button></div>
     <div class="sub" style="margin-bottom:8px">El nombre y el cargo aparecen en la cotización de cada persona al abrir su link. Se guardan en la base de datos de Polar, no en el repositorio público.</div>
     <div id="people"></div>
-  </div>
+  </details>
 
   <div class="grid g2">
     <div class="card"><h2>Actividad reciente</h2><div class="feed" id="feed"></div></div>
@@ -196,6 +201,7 @@ function render() {
     return r;
   });
   lastRows = rows;
+  $("pcount").textContent = `· ${rows.length} ${rows.length === 1 ? "liga" : "ligas"}`;
   const N = q.codigos.length;
   $("k1").innerHTML = `${opened}<small> de ${N}</small>`; $("k2").textContent = tOpens; $("k3").textContent = tDl;
   $("k4").textContent = mins(tSecs); $("k5").textContent = lastAct ? ago(lastAct).replace("hace ", "") : "—";
