@@ -47,9 +47,8 @@ async function start() {
   }), { threshold: 0.15 });
   document.querySelectorAll(".sheet").forEach(s => io.observe(s));
 
-  const dl = document.getElementById("dl");
-  if (dl) dl.addEventListener("click", () => {
-    push(ref(db, `trineo/tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev });
+  document.querySelectorAll(".dl").forEach(dl => dl.addEventListener("click", () => {
+    push(ref(db, `trineo/tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev }));
   });
 }
 start().catch(e => console.warn("Seguimiento:", e));
