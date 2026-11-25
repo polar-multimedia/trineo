@@ -9,8 +9,8 @@ export const COTIZACIONES = {
     monto: 450000,
     nota: "Paquete anual · pesos mexicanos (MXN) más IVA",
     limite: "2026-11-30",
-    pdf: "assets/Cotizacion-Carnot-Co-Rep-2027.pdf?v=3",
-    secciones: ["Planes", "Inversión y capacidad", "Cómo funciona", "Interacciones y calendario", "Condiciones"],
+    pdf: "assets/Cotizacion-Carnot-Co-Rep-2027.pdf?v=4",
+    secciones: ["Planes", "Inversión y capacidad", "Cómo funciona", "Tecnología y limitaciones", "Interacciones y calendario", "Condiciones"],
     desde: 1795619541517, // el panel ignora la actividad anterior a este momento (pruebas)
     codigos: ["equipo-snc"]
   }
