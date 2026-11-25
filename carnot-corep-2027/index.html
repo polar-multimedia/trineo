@@ -149,6 +149,12 @@ main{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:10px 24px
 .btn.glow{background:linear-gradient(110deg,#1F9C9B,#4ECBCA 50%,#E0179D);background-size:200% 100%;font-size:14px;padding:15px 26px;box-shadow:0 0 0 1px rgba(255,255,255,.25),0 10px 40px rgba(78,203,202,.45);animation:sweep 6s ease-in-out infinite alternate}
 .h-scroll{position:absolute;left:50%;bottom:26px;width:26px;height:42px;margin-left:-13px;border:2px solid rgba(255,255,255,.6);border-radius:14px}
 .h-scroll i{position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:wheel 1.8s ease-in-out infinite}
+.h-para{display:inline-flex;flex-direction:column;gap:2px;padding:14px 20px;border-radius:16px;background:rgba(6,20,34,.55);border:1px solid rgba(127,230,228,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-bottom:8px;opacity:0;animation:rise 1s ease forwards}
+.h-para span{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7FE6E4}
+.h-para b{font-size:clamp(18px,2.6vw,24px);font-weight:800;color:#fff;line-height:1.25}
+.h-para i{font-style:normal;font-size:14px;font-weight:700;color:#E3F4F6}
+.h-para em{font-style:normal;font-size:12px;font-weight:700;color:#A9C4CA;margin-top:4px}
+.meta .at{font-size:7pt;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tealD)}
 @keyframes rise{to{opacity:1;transform:none;filter:none}}
 @keyframes sweep{to{background-position:100% 0}}
 @keyframes wheel{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
@@ -164,7 +170,7 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 <body>
 <header class="hero">
   <div class="hero-in">
-    <div class="h-eye">Cotización para Carnot Laboratorios · Portafolio SNC</div>
+    <div class="h-para"><span>Cotización preparada para</span><b id="para-nombre">Carnot Laboratorios</b><i id="para-cargo">Gerencia Nacional de Ventas · Portafolio SNC</i><em>25 de noviembre de 2026 · Vigencia 30 días · Confidencial</em></div>
     <h1 class="h-title"><span>Cada visita,</span> <span>preparada</span> <span>y diferente.</span></h1>
     <p class="h-lead">Co-Rep es un copiloto con IA que prepara la visita antes y la registra después, con el contenido aprobado de las siete marcas.</p>
     <div class="h-cta"><a class="btn glow" href="#planes">Ver la propuesta</a><span>$37,500 /mes + IVA · usuarios ilimitados</span></div>
@@ -177,7 +183,7 @@ footer.site .foot{background:rgba(250,253,254,.93)}
 <!-- PÁGINA 1 -->
 <div class="top">
   <img src="assets/logo.svg" alt="">
-  <div class="meta"><b>Cotización para Carnot Laboratorios</b><br>Portafolio SNC · Noviembre 2026<br>Confidencial</div>
+  <div class="meta"><span class="at">Atención</span><br><b id="para-nombre2">Carnot Laboratorios</b><br><span id="para-cargo2">Gerencia Nacional de Ventas · Portafolio SNC</span><br>Carnot Laboratorios · 25 de noviembre de 2026</div>
 </div>
 
 
@@ -353,6 +359,17 @@ footer.site .foot{background:rgba(250,253,254,.93)}
  <img class="flogo" src="assets/logo.svg" alt="">
 </div></div>
 <p class="priv">Esta página registra cuándo se abre y se descarga, solo para dar seguimiento a la propuesta. No guarda datos personales adicionales.</p></footer>
+<script type="module">
+import { FIREBASE } from "../shared/firebase.js";
+const c=(new URLSearchParams(location.search).get("c")||"").replace(/[^a-z0-9-]/gi,"").slice(0,24);
+const doc=document.querySelector("meta[name=cotizacion]").content;
+if(c){const get=f=>fetch(`${FIREBASE.databaseURL}/trineo/directorio/${doc}/${c}/${f}.json`).then(r=>r.ok?r.json():null).catch(()=>null);
+ const [n,k]=await Promise.all([get("name"),get("cargo")]);
+ if(typeof n==="string"&&n.trim()){["para-nombre","para-nombre2"].forEach(i=>document.getElementById(i).textContent=n.trim());
+  const cargo=(typeof k==="string"&&k.trim())?k.trim()+" · Carnot Laboratorios":"Carnot Laboratorios · Portafolio SNC";
+  ["para-cargo","para-cargo2"].forEach(i=>document.getElementById(i).textContent=cargo);
+  document.title="Co-Rep · Cotización para "+n.trim();}}
+</script>
 <script type="module" src="../shared/polar-fx.js"></script>
 <script type="module" src="../shared/track.js"></script>
 </body></html>

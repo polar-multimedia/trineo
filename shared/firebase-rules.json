@@ -15,6 +15,7 @@
         }
       },
       "directorio": {
+        "$doc": { "$code": { "name": { ".read": true }, "cargo": { ".read": true } } },
         ".write": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')"
       },
       "seguimiento": {
