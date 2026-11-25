@@ -11,3 +11,5 @@ export const FIREBASE = {
 };
 // Dominio con acceso al panel: cualquier cuenta de Google de Polar.
 export const ADMIN_DOMAIN = "@polarmultimedia.com";
+// Liga al Hub Polar Administrativo (dejar vacío si aún no se conecta).
+export const HUB_URL = "";

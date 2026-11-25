@@ -1,122 +1,279 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Panel · Seguimiento de cotizaciones</title>
+<title>Trineo · Seguimiento de entregables</title>
 <link rel="icon" href="../shared/logo.svg">
+<link rel="stylesheet" href="../shared/polar-fx.css">
 <style>
 @font-face{font-family:Manrope;src:url(../shared/manrope-latin-400-normal.woff2);font-weight:400}
 @font-face{font-family:Manrope;src:url(../shared/manrope-latin-700-normal.woff2);font-weight:700}
 @font-face{font-family:Manrope;src:url(../shared/manrope-latin-800-normal.woff2);font-weight:800}
-:root{--teal:#4ECBCA;--tealD:#1F9C9B;--mag:#E0179D;--navy:#1A3A5C;--ink:#22313F;--mute:#5F6B78;--line:rgba(26,58,92,.12)}
-*{box-sizing:border-box}
-body{margin:0;font-family:Manrope;font-size:14px;color:var(--ink);background:#F3FAFB url(../shared/ice.svg) center/cover fixed;min-height:100vh}
-main{max-width:1040px;margin:0 auto;padding:28px 20px 40px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px;flex-wrap:wrap}
-header img{height:40px}
-h1{font-weight:800;font-size:20px;color:var(--navy);margin:0}
-.sub{color:var(--mute);font-size:13px}
-.card{background:rgba(255,255,255,.8);border:1px solid #fff;border-radius:16px;box-shadow:0 10px 30px rgba(26,58,92,.06);padding:18px 20px;margin-bottom:16px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.kpi .n{font-weight:800;font-size:24px;color:var(--tealD)} .kpi .l{font-size:12px;color:var(--mute)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
-td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
-td b{color:var(--navy)}
-.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin:2px 4px 0 0}
-.ok{background:rgba(31,156,155,.12);color:var(--tealD)} .no{background:rgba(26,58,92,.07);color:var(--mute)}
-.warn{background:rgba(224,23,157,.1);color:var(--mag)}
-.btn{font-family:inherit;font-weight:800;font-size:13px;color:#fff;border:0;padding:10px 18px;border-radius:10px;background:linear-gradient(110deg,var(--navy),var(--tealD));cursor:pointer}
-.links code{font-size:12px;background:rgba(26,58,92,.06);padding:2px 6px;border-radius:6px;word-break:break-all}
-.feed div{padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
-.feed span{color:var(--mute)}
-#msg{color:var(--mute)}
-@media (max-width:720px){.kpis{grid-template-columns:1fr 1fr} .hide-m{display:none}}
+:root{--teal:#4ECBCA;--tealD:#1F9C9B;--mag:#E0179D;--navy:#1A3A5C;--ink:#EAF6F7;--mute:#A9C4CA;--line:rgba(255,255,255,.12);--card:rgba(10,28,44,.72)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;font-family:Manrope,system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--ink);min-height:100vh;overflow-x:hidden}
+main{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+header .brand{display:flex;align-items:center;gap:14px}
+header img{height:42px;background:rgba(255,255,255,.94);border-radius:10px;padding:5px 8px}
+h1{font-weight:800;font-size:22px;margin:0;letter-spacing:-.01em}
+h2{font-weight:800;font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:16px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--mag))}
+.sub{color:var(--mute);font-size:12.5px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.grid{display:grid;gap:16px;margin-bottom:16px}
+.g2{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+.kpi .n{font-weight:800;font-size:26px;line-height:1.1;color:#fff} .kpi .n small{font-size:13px;color:var(--mute);font-weight:700}
+.kpi .l{font-size:12px;color:var(--mute);margin-top:4px}
+.kpi.hot .n{color:#FF8FD6} .kpi.ok .n{color:#7FE6E4}
+select,input,textarea{font-family:inherit;font-size:14px;color:#fff;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}
+select option{color:#111}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
+label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 5px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{font-family:inherit;font-weight:800;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,.2);padding:10px 16px;border-radius:10px;background:linear-gradient(110deg,var(--tealD),#2BB6B5);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.ghost{background:rgba(255,255,255,.07)} .btn.mag{background:linear-gradient(110deg,#B0127C,var(--mag))}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.big{font-weight:800;font-size:30px;color:#fff;line-height:1.1}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:rgba(78,203,202,.18);color:#8DEDEB} .p-no{background:rgba(255,255,255,.08);color:var(--mute)}
+.p-hot{background:rgba(224,23,157,.25);color:#FF9BDB} .p-warm{background:rgba(255,190,90,.18);color:#FFD08A} .p-cold{background:rgba(120,170,255,.16);color:#A9C8FF}
+.person{border-top:1px solid var(--line);padding:16px 0}
+.person:first-of-type{border-top:0;padding-top:4px}
+.p-head{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.3fr) auto;gap:10px;align-items:center}
+.p-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:12px 0 10px}
+.p-stats div{background:rgba(255,255,255,.05);border-radius:10px;padding:8px 10px}
+.p-stats b{display:block;font-size:16px;color:#fff} .p-stats span{font-size:11px;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--mute)}
+.chip.on{background:rgba(78,203,202,.2);color:#8DEDEB}
+.bar{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:12.5px;margin:7px 0}
+.bar i{display:block;height:9px;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--mag));min-width:2px}
+.bar .track{background:rgba(255,255,255,.07);border-radius:6px}
+.feed div,.notes div{padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.feed span,.notes span{color:var(--mute);font-size:12px}
+[hidden]{display:none!important}
+.tip{display:block;padding:10px 12px;border-radius:12px;background:rgba(224,23,157,.12);border:1px solid rgba(224,23,157,.3);margin-bottom:8px;font-size:13px}
+.tip.calm{background:rgba(78,203,202,.1);border-color:rgba(78,203,202,.3)}
+iframe{width:100%;height:560px;border:0;border-radius:14px;background:#06111d}
+code{font-size:11.5px;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;word-break:break-all;color:#CFEDEE}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#fff;color:#1A3A5C;font-weight:800;font-size:13px;padding:10px 18px;border-radius:30px;z-index:20;opacity:0;transition:opacity .3s;pointer-events:none}
+#toast.on{opacity:1}
+#login{max-width:460px;margin:12vh auto 0;text-align:center}
+@media (max-width:900px){.g2,.g3{grid-template-columns:minmax(0,1fr)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.p-head{grid-template-columns:minmax(0,1fr)}.p-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.fields{grid-template-columns:minmax(0,1fr)}iframe{height:480px}}
 </style></head>
-<body><main>
+<body data-fx="soft"><main>
 <header>
-  <div><h1>Seguimiento de cotizaciones</h1><div class="sub">Cotizaciones de Polar</div></div>
-  <img src="../shared/logo.svg" alt="">
+  <div class="brand"><img src="../shared/logo.svg" alt="Polar Multimedia"><div><h1>Trineo · Seguimiento de entregables</h1><div class="sub" id="who">Cotizaciones, propuestas y presentaciones enviadas a clientes</div></div></div>
+  <div class="row"><a class="btn ghost" id="hub" hidden target="_blank" rel="noopener">Hub Polar Administrativo</a><button class="btn ghost" id="out" hidden>Salir</button></div>
 </header>
-<div id="login" class="card"><p id="msg">Inicia sesión con la cuenta autorizada para ver el seguimiento.</p><button class="btn" id="go">Entrar con Google</button></div>
+
+<div id="login" class="card"><h1 style="margin-bottom:8px">Entrar al panel</h1><p class="sub" id="msg">Usa tu cuenta de Google de Polar, la misma del Hub Polar Administrativo.</p><p><button class="btn" id="go">Entrar con Google</button></p></div>
+
 <div id="app" hidden>
-  <div class="card"><label style="font-size:12px;color:var(--mute)">Cotización</label><br><select id="sel" style="font-family:inherit;font-size:15px;font-weight:700;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:4px;width:100%"></select></div>
-  <div class="kpis">
-    <div class="card kpi"><div class="n" id="k1">0</div><div class="l">destinatarios que abrieron</div></div>
-    <div class="card kpi"><div class="n" id="k2">0</div><div class="l">aperturas en total</div></div>
-    <div class="card kpi"><div class="n" id="k3">0</div><div class="l">descargas del PDF</div></div>
-    <div class="card kpi"><div class="n" id="k4">0 min</div><div class="l">tiempo total de lectura</div></div>
+  <div class="grid g2">
+    <div class="card">
+      <label for="sel">Entregable</label><select id="sel"></select>
+      <div class="row" style="justify-content:space-between;margin-top:16px;align-items:flex-end">
+        <div><div class="sub" id="f-cliente"></div><div class="big" id="f-monto"></div><div class="sub" id="f-nota"></div></div>
+        <div class="row"><a class="btn" id="b-open" target="_blank" rel="noopener">Ver cotización</a><a class="btn ghost" id="b-pdf" target="_blank" rel="noopener">PDF</a><button class="btn ghost" id="b-prev">Vista previa aquí</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Seguimiento comercial</h2>
+      <div class="fields">
+        <div><label for="s-estatus">Estatus</label><select id="s-estatus"><option>Borrador</option><option>Enviada</option><option>En revisión del cliente</option><option>En negociación</option><option>Ganada</option><option>Perdida</option></select></div>
+        <div><label for="s-envio">Fecha de envío</label><input type="date" id="s-envio"></div>
+        <div><label for="s-accion">Próxima acción</label><input id="s-accion" placeholder="Ej. llamar a José Luis"></div>
+        <div><label for="s-fecha">Fecha de la próxima acción</label><input type="date" id="s-fecha"></div>
+      </div>
+    </div>
   </div>
-  <div class="card"><table><thead><tr><th>Destinatario</th><th>Aperturas</th><th class="hide-m">Primera / última</th><th>Lectura</th><th>Descarga</th><th class="hide-m">Dispositivos</th></tr></thead><tbody id="rows"></tbody></table></div>
-  <div class="card"><b style="color:var(--navy)">Actividad reciente</b><div class="feed" id="feed"></div></div>
-  <div class="card links"><b style="color:var(--navy)">Links por destinatario</b><div class="sub">Escribe el nombre de cada persona; se guarda en Firebase, no en el repositorio.</div><div id="links"></div></div>
+
+  <div class="card" id="prev" hidden style="margin-bottom:16px"><iframe id="frame" title="Vista previa de la cotización"></iframe></div>
+
+  <div class="grid kpis">
+    <div class="card kpi ok"><div class="n" id="k1">0</div><div class="l">destinatarios que abrieron</div></div>
+    <div class="card kpi"><div class="n" id="k2">0</div><div class="l">aperturas en total</div></div>
+    <div class="card kpi ok"><div class="n" id="k3">0</div><div class="l">descargas del PDF</div></div>
+    <div class="card kpi"><div class="n" id="k4">0</div><div class="l">tiempo total de lectura</div></div>
+    <div class="card kpi"><div class="n" id="k5">—</div><div class="l">última actividad</div></div>
+    <div class="card kpi hot"><div class="n" id="k6">—</div><div class="l" id="k6l">para la fecha límite</div></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card"><h2>Qué conviene hacer ahora</h2><div id="tips"></div></div>
+    <div class="card"><h2>Secciones más leídas</h2><div id="bars"></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Destinatarios</h2><button class="btn ghost sm" id="csv">Exportar a Excel (CSV)</button></div>
+    <div class="sub" style="margin-bottom:8px">Los nombres y correos se guardan en la base de datos de Polar, no en el repositorio público.</div>
+    <div id="people"></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card"><h2>Actividad reciente</h2><div class="feed" id="feed"></div></div>
+    <div class="card"><h2>Bitácora de seguimiento</h2>
+      <div class="row"><input id="note" placeholder="Ej. Llamé a Francisco, pide ver el demo" style="flex:1"><button class="btn sm" id="addnote">Agregar</button></div>
+      <div class="notes" id="notes" style="margin-top:8px"></div>
+    </div>
+  </div>
 </div>
 </main>
+<div id="toast" role="status"></div>
+<script type="module" src="../shared/polar-fx.js"></script>
 <script type="module">
-import { FIREBASE, ADMIN_DOMAIN } from "../shared/firebase.js";
+import { FIREBASE, ADMIN_DOMAIN, HUB_URL } from "../shared/firebase.js";
 import { COTIZACIONES } from "../cotizaciones.js";
 const $ = id => document.getElementById(id);
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const root = location.href.replace(/panel\/.*$/, "");
 const docs = Object.keys(COTIZACIONES);
-$("sel").innerHTML = docs.map(d => `<option value="${d}">${COTIZACIONES[d].titulo}</option>`).join("");
-let current = docs[0], unsub = null, db, ref, onValue;
-let DIR = {};
-function showLinks() {
-  const codes = COTIZACIONES[current].codigos;
-  $("links").innerHTML = codes.map(c => `<p><input data-c="${c}" placeholder="Nombre del destinatario" value="${esc((DIR[c]||{}).name||"")}" style="font-family:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:min(320px,100%)"><br><code>${root}${current}/?c=${c}</code></p>`).join("");
-  $("links").querySelectorAll("input").forEach(i => i.onchange = () => saveName && saveName(i.dataset.c, i.value.trim()));
+const fmt = t => t ? new Date(t).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+const mins = s => s < 60 ? `${Math.round(s)} s` : `${Math.round(s / 60)} min`;
+const ago = t => { if (!t) return "—"; const m = (Date.now() - t) / 60000; return m < 60 ? `hace ${Math.max(1, Math.round(m))} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} d`; };
+const money = n => "$" + Number(n || 0).toLocaleString("en-US");
+const toast = t => { $("toast").textContent = t; $("toast").classList.add("on"); setTimeout(() => $("toast").classList.remove("on"), 1800); };
+const dev = ua => /iPhone|Android.+Mobile/i.test(ua || "") ? "Celular" : /iPad|Tablet/i.test(ua || "") ? "Tableta" : "Computadora";
+let current = docs[0], DIR = {}, TRK = {}, SEG = {}, api = null, lastRows = [];
+$("sel").innerHTML = docs.map(d => `<option value="${esc(d)}">${esc(COTIZACIONES[d].titulo)}</option>`).join("");
+if (HUB_URL) { $("hub").href = HUB_URL; $("hub").hidden = false; }
+const link = c => `${root}${current}/?c=${c}`;
+
+function ficha() {
+  const q = COTIZACIONES[current];
+  $("f-cliente").textContent = `${q.cliente} · ${q.proyecto}`;
+  $("f-monto").textContent = `${money(q.monto)} + IVA`;
+  $("f-nota").textContent = q.nota || "";
+  $("b-open").href = `${root}${current}/?nt=1`;
+  $("b-pdf").href = `${root}${current}/${q.pdf}`;
+  if (!$("prev").hidden) $("frame").src = `${root}${current}/?nt=1`;
 }
-let saveName = null;
-showLinks();
-if (FIREBASE.databaseURL.includes("PENDIENTE")) { $("msg").textContent = "Falta configurar Firebase en shared/firebase.js."; $("go").hidden = true; }
+$("b-prev").onclick = () => { const p = $("prev"); p.hidden = !p.hidden; $("b-prev").textContent = p.hidden ? "Vista previa aquí" : "Ocultar vista previa"; if (!p.hidden) $("frame").src = `${root}${current}/?nt=1`; };
+
+function emailCard(c, name) {
+  const q = COTIZACIONES[current], u = link(c);
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="520" style="width:520px;max-width:100%;border-collapse:separate;font-family:Segoe UI,Arial,sans-serif;"><tr><td style="background:#1A3A5C;border-radius:16px 16px 0 0;padding:22px 26px 18px;"><div style="font-size:11px;letter-spacing:2px;font-weight:bold;color:#4ECBCA;text-transform:uppercase;">Polar · Cotización</div><div style="font-size:22px;line-height:28px;font-weight:bold;color:#ffffff;margin-top:6px;">${esc(q.proyecto)}</div><div style="font-size:13px;line-height:19px;color:#D9F3F3;margin-top:4px;">${esc(q.cliente)}</div></td></tr><tr><td style="background:#F3FAFB;border:1px solid #D7ECEE;border-top:0;border-radius:0 0 16px 16px;padding:18px 26px 22px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="font-size:13px;color:#5F6B78;line-height:19px;">${esc(q.nota || "")}</td><td align="right" style="padding-left:12px;"><a href="${u}" target="_blank" style="display:inline-block;background:#E0179D;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:13px 22px;border-radius:10px;">Ver y descargar</a></td></tr></table></td></tr></table>`;
+}
+async function copy(text, html) {
+  try {
+    if (html && window.ClipboardItem) await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })]);
+    else await navigator.clipboard.writeText(text);
+    toast("Copiado");
+  } catch (e) { toast("No se pudo copiar"); }
+}
+
+function heat(r) {
+  let s = Math.min(3, r.opens) * 12 + Math.min(40, r.secs / 6) + r.seen.size * 5 + (r.dl ? 25 : 0);
+  if (r.last && Date.now() - r.last < 864e5) s += 8;
+  s = Math.min(100, Math.round(s));
+  return { s, label: !r.opens ? "Sin abrir" : s >= 65 ? "Caliente" : s >= 35 ? "Tibio" : "Frío", cls: !r.opens ? "p-no" : s >= 65 ? "p-hot" : s >= 35 ? "p-warm" : "p-cold" };
+}
+
+function render() {
+  const q = COTIZACIONES[current], secNames = q.secciones || [];
+  const visits = TRK.visits || {}, downloads = TRK.downloads || {};
+  const codes = [...new Set([...q.codigos, ...Object.keys(visits), ...Object.keys(downloads)])];
+  const feed = [], secCount = secNames.map(() => 0);
+  let opened = 0, tOpens = 0, tDl = 0, tSecs = 0, lastAct = 0;
+  const rows = codes.map(c => {
+    const known = q.codigos.includes(c), d = DIR[c] || {};
+    const name = d.name || (known ? `Código ${c}` : c === "sin-codigo" ? "Link sin código" : `Código ${c} (no registrado)`);
+    const v = Object.values(visits[c] || {}), dls = Object.values(downloads[c] || {});
+    const secs = v.reduce((a, x) => a + (Number(x.secs) || 0), 0);
+    const seen = new Set(v.flatMap(x => String(x.sections || "").split(",").filter(Boolean)));
+    const devs = new Set([...v, ...dls].map(x => x.device));
+    const kinds = [...new Set(v.map(x => dev(x.ua)))];
+    const first = v.length ? Math.min(...v.map(x => x.start)) : 0;
+    const last = Math.max(0, ...v.map(x => x.last || x.start), ...dls.map(x => x.ts));
+    const r = { c, known, name, email: d.email || "", opens: v.length, secs, seen, dl: dls.length, dlAt: dls.length ? Math.max(...dls.map(x => x.ts)) : 0, devs: devs.size, kinds, first, last, tz: (v[v.length - 1] || {}).tz || "" };
+    r.heat = heat(r);
+    if (known || c !== "prueba") { if (v.length && known) opened++; if (c !== "prueba") { tOpens += v.length; tDl += dls.length; tSecs += secs; lastAct = Math.max(lastAct, last); seen.forEach(i => { if (secCount[i - 1] != null) secCount[i - 1]++; }); } }
+    v.forEach(x => feed.push({ t: x.start, txt: `<b>${esc(name)}</b> abrió la cotización · ${dev(x.ua)} · leyó ${mins(Number(x.secs) || 0)}` }));
+    dls.forEach(x => feed.push({ t: x.ts, txt: `<b>${esc(name)}</b> descargó el PDF` }));
+    return r;
+  });
+  lastRows = rows;
+  const N = q.codigos.length;
+  $("k1").innerHTML = `${opened}<small> de ${N}</small>`; $("k2").textContent = tOpens; $("k3").textContent = tDl;
+  $("k4").textContent = mins(tSecs); $("k5").textContent = lastAct ? ago(lastAct).replace("hace ", "") : "—";
+  if (q.limite) { const dd = Math.ceil((new Date(q.limite + "T23:59:59") - Date.now()) / 864e5); $("k6").innerHTML = dd >= 0 ? `${dd}<small> días</small>` : "Vencida"; $("k6l").textContent = `para la fecha límite (${new Date(q.limite + "T12:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })})`; }
+
+  $("people").innerHTML = rows.map(r => `<div class="person">
+    <div class="p-head">
+      <input data-c="${esc(r.c)}" data-f="name" placeholder="Nombre del destinatario" value="${esc(DIR[r.c]?.name || "")}" ${r.known ? "" : "disabled"} aria-label="Nombre">
+      <input data-c="${esc(r.c)}" data-f="email" type="email" placeholder="Correo" value="${esc(r.email)}" ${r.known ? "" : "disabled"} aria-label="Correo">
+      <div class="row"><span class="pill ${r.heat.cls}">${r.heat.label}${r.opens ? " · " + r.heat.s : ""}</span>${r.devs > 1 ? `<span class="pill p-hot">Posible reenvío</span>` : ""}</div>
+    </div>
+    <div class="p-stats">
+      <div><b>${r.opens}</b><span>aperturas</span></div>
+      <div><b>${r.opens ? mins(r.secs) : "—"}</b><span>tiempo de lectura</span></div>
+      <div><b>${r.dl ? "Sí" : "No"}</b><span>${r.dl ? "descargó · " + fmt(r.dlAt) : "descarga del PDF"}</span></div>
+      <div><b>${r.last ? ago(r.last) : "—"}</b><span>${r.first ? "primera vez: " + fmt(r.first) : "última actividad"}</span></div>
+      <div><b>${r.kinds.join(", ") || "—"}</b><span>${r.devs || 0} dispositivo(s)${r.tz ? " · " + esc(r.tz.split("/").pop().replace(/_/g, " ")) : ""}</span></div>
+    </div>
+    <div class="chips" style="margin-bottom:10px">${secNames.map((n, i) => `<span class="chip ${r.seen.has(String(i + 1)) ? "on" : ""}">${esc(n)}</span>`).join("")}</div>
+    ${r.known ? `<div class="row"><code>${esc(link(r.c))}</code><button class="btn ghost sm" data-copy="${esc(r.c)}">Copiar link</button><button class="btn mag sm" data-card="${esc(r.c)}">Copiar tarjeta para correo</button>${r.email ? `<a class="btn ghost sm" href="mailto:${esc(r.email)}">Escribirle</a>` : ""}</div>` : ""}
+  </div>`).join("");
+  $("people").querySelectorAll("input").forEach(i => i.onchange = () => api && api.set(`trineo/directorio/${current}/${i.dataset.c}/${i.dataset.f}`, i.value.trim()).then(() => toast("Guardado")));
+  $("people").querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copy(link(b.dataset.copy)));
+  $("people").querySelectorAll("[data-card]").forEach(b => b.onclick = () => copy(link(b.dataset.card), emailCard(b.dataset.card)));
+
+  const mx = Math.max(1, ...secCount);
+  $("bars").innerHTML = secNames.map((n, i) => `<div class="bar"><span>${esc(n)}</span><div class="track"><i style="width:${Math.round(secCount[i] / mx * 100)}%"></i></div><b>${secCount[i]}</b></div>`).join("") + `<div class="sub" style="margin-top:8px">Personas que llegaron a cada sección.</div>`;
+  $("feed").innerHTML = feed.sort((a, b) => b.t - a.t).slice(0, 25).map(f => `<div>${f.txt}<br><span>${fmt(f.t)} · ${ago(f.t)}</span></div>`).join("") || `<div><span>Aún no hay actividad.</span></div>`;
+
+  // Sugerencias
+  const tips = [], real = rows.filter(r => r.known), env = SEG.envio ? new Date(SEG.envio + "T09:00").getTime() : 0, days = env ? (Date.now() - env) / 864e5 : 0;
+  if (!SEG.envio) tips.push(["calm", "Registra la fecha de envío para medir cuánto tardan en abrirla."]);
+  real.filter(r => r.heat.label === "Caliente").forEach(r => tips.push(["", `<b>${esc(r.name)}</b> está caliente (${r.heat.s}): ${r.opens} aperturas, ${mins(r.secs)} de lectura${r.dl ? " y descargó el PDF" : ""}. Buen momento para llamarle.`]));
+  real.filter(r => r.opens && !r.dl && r.heat.label !== "Caliente").forEach(r => tips.push(["calm", `<b>${esc(r.name)}</b> la abrió pero no descargó el PDF. Vale un mensaje corto preguntando si tiene dudas.`]));
+  real.filter(r => r.opens && !r.seen.has("2")).forEach(r => tips.push(["calm", `<b>${esc(r.name)}</b> no llegó al detalle de la inversión.`]));
+  if (env && days >= 2) real.filter(r => !r.opens).forEach(r => tips.push(["", `<b>${esc(r.name)}</b> no la ha abierto y ya pasaron ${Math.floor(days)} días desde el envío. Conviene reenviarle su link.`]));
+  real.filter(r => r.devs > 1).forEach(r => tips.push(["calm", `El link de <b>${esc(r.name)}</b> se abrió en ${r.devs} dispositivos: puede que lo haya compartido con alguien más.`]));
+  if (SEG.accion) tips.unshift(["", `Próxima acción: <b>${esc(SEG.accion)}</b>${SEG.fecha ? " · " + new Date(SEG.fecha + "T12:00").toLocaleDateString("es-MX", { day: "numeric", month: "long" }) : ""}`]);
+  $("tips").innerHTML = tips.slice(0, 7).map(([c, t]) => `<div class="tip ${c}">${t}</div>`).join("") || `<div class="sub">Sin pendientes por ahora.</div>`;
+
+  const notes = Object.values(SEG.notas || {}).sort((a, b) => b.ts - a.ts);
+  $("notes").innerHTML = notes.map(n => `<div>${esc(n.txt)}<br><span>${fmt(n.ts)} · ${esc(n.by || "")}</span></div>`).join("") || `<div><span>Sin notas todavía.</span></div>`;
+  ["estatus", "envio", "accion", "fecha"].forEach(k => { const el = $("s-" + k); if (document.activeElement !== el) el.value = SEG[k] || (k === "estatus" ? "Borrador" : ""); });
+}
+
+$("csv").onclick = () => {
+  const head = ["Nombre", "Correo", "Código", "Interés", "Aperturas", "Segundos de lectura", "Secciones vistas", "Descargó", "Primera apertura", "Última actividad", "Dispositivos"];
+  const lines = lastRows.map(r => [r.name, r.email, r.c, `${r.heat.label} ${r.heat.s}`, r.opens, r.secs, r.seen.size, r.dl ? "Sí" : "No", r.first ? new Date(r.first).toLocaleString("es-MX") : "", r.last ? new Date(r.last).toLocaleString("es-MX") : "", r.devs]);
+  const csv = "﻿" + [head, ...lines].map(l => l.map(x => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `seguimiento-${current}.csv`; a.click();
+};
+
+ficha();
+if (FIREBASE.databaseURL.includes("PENDIENTE")) { $("msg").textContent = "Falta configurar Firebase."; $("go").hidden = true; }
 else {
   const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-  const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-  ({ getDatabase: db, ref, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"));
-  const app = initializeApp(FIREBASE), auth = getAuth(app); db = db(app);
-  $("go").onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-  const { set } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
-  saveName = (c, name) => set(ref(db, `trineo/directorio/${current}/${c}/name`), name);
-  let unsubDir = null;
+  const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  const { getDatabase, ref, onValue, set, push } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+  const app = initializeApp(FIREBASE), auth = getAuth(app), db = getDatabase(app);
+  let user = null, unsubs = [];
+  api = { set: (path, val) => set(ref(db, path), val) };
+  $("go").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => { $("msg").textContent = "No se pudo iniciar sesión: " + (e.code || e.message); });
+  $("out").onclick = () => signOut(auth).then(() => location.reload());
   const watch = () => {
-    if (unsub) unsub(); if (unsubDir) unsubDir();
-    let last = {};
-    unsubDir = onValue(ref(db, `trineo/directorio/${current}`), snap => { DIR = snap.val() || {}; showLinks(); render(last); });
-    unsub = onValue(ref(db, `trineo/tracking/${current}`), snap => { last = snap.val() || {}; render(last); });
+    unsubs.forEach(u => u()); DIR = {}; TRK = {}; SEG = {};
+    const on = (path, fn) => unsubs.push(onValue(ref(db, path), s => { fn(s.val() || {}); render(); }, e => { $("tips").innerHTML = `<div class="tip">No se pudo leer la base de datos (${esc(e.code || "")}). Revisa que las reglas estén publicadas.</div>`; }));
+    on(`trineo/directorio/${current}`, v => DIR = v); on(`trineo/tracking/${current}`, v => TRK = v); on(`trineo/seguimiento/${current}`, v => SEG = v);
   };
-  $("sel").onchange = e => { current = e.target.value; showLinks(); watch(); };
+  $("sel").onchange = e => { current = e.target.value; ficha(); watch(); };
+  ["estatus", "envio", "accion", "fecha"].forEach(k => $("s-" + k).onchange = e => api.set(`trineo/seguimiento/${current}/${k}`, e.target.value).then(() => toast("Guardado")));
+  const addNote = () => { const t = $("note").value.trim(); if (!t) return; push(ref(db, `trineo/seguimiento/${current}/notas`), { txt: t, ts: Date.now(), by: (user.displayName || user.email || "").split("@")[0] }); $("note").value = ""; };
+  $("addnote").onclick = addNote; $("note").onkeydown = e => { if (e.key === "Enter") addNote(); };
   onAuthStateChanged(auth, u => {
     if (!u) return;
-    if (!(u.email || "").endsWith(ADMIN_DOMAIN)) { $("msg").textContent = "Esta cuenta no tiene acceso al panel."; return; }
-    $("login").hidden = true; $("app").hidden = false; watch();
+    if (!(u.email || "").endsWith(ADMIN_DOMAIN)) { $("msg").textContent = "Esta cuenta no tiene acceso. Entra con tu cuenta de Polar."; signOut(auth); return; }
+    user = u; $("login").hidden = true; $("app").hidden = false; $("out").hidden = false;
+    $("who").textContent = `Sesión de ${u.displayName || u.email}`; watch();
   });
-}
-const fmt = t => t ? new Date(t).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
-const mins = s => s < 60 ? `${s} s` : `${Math.round(s / 60)} min`;
-function render(data) {
-  const RECIPIENTS = Object.fromEntries(COTIZACIONES[current].codigos.map(c => [c, { name: (DIR[c] || {}).name || `Código ${c}`, email: (DIR[c] || {}).email || "" }]));
-  const visits = data.visits || {}, downloads = data.downloads || {};
-  const codes = new Set([...Object.keys(RECIPIENTS), ...Object.keys(visits), ...Object.keys(downloads)]);
-  let opened = 0, totalOpens = 0, totalDl = 0, totalSecs = 0; const feed = [];
-  const rows = [...codes].map(c => {
-    const r = RECIPIENTS[c] || { name: c === "sin-codigo" ? "Sin código (link genérico)" : `Código ${esc(c)}` };
-    const v = Object.values(visits[c] || {}), d = Object.values(downloads[c] || {});
-    const secs = v.reduce((a, x) => a + (Number(x.secs) || 0), 0), devs = new Set(v.map(x => x.device).concat(d.map(x => x.device)));
-    const secSeen = new Set(v.flatMap(x => String(x.sections || "").split(",").filter(Boolean)));
-    if (v.length) opened++; totalOpens += v.length; totalDl += d.length; totalSecs += secs;
-    v.forEach(x => feed.push({ t: x.start, txt: `<b>${esc(r.name)}</b> abrió la cotización` }));
-    d.forEach(x => feed.push({ t: x.ts, txt: `<b>${esc(r.name)}</b> descargó el PDF` }));
-    const first = Math.min(...v.map(x => x.start)), last = Math.max(...v.map(x => x.last || x.start));
-    return `<tr><td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.email || "")}</span></td>
-      <td>${v.length ? `<span class="tag ok">${v.length}</span>` : `<span class="tag no">Sin abrir</span>`}</td>
-      <td class="hide-m">${v.length ? `${fmt(first)}<br><span class="sub">${fmt(last)}</span>` : "—"}</td>
-      <td>${v.length ? `${mins(secs)}<br><span class="sub">${secSeen.size} de 5 secciones</span>` : "—"}</td>
-      <td>${d.length ? `<span class="tag ok">Sí · ${fmt(Math.max(...d.map(x => x.ts)))}</span>` : `<span class="tag no">No</span>`}</td>
-      <td class="hide-m">${devs.size || "—"} ${devs.size > 1 ? `<span class="tag warn">Posible reenvío</span>` : ""}</td></tr>`;
-  });
-  $("rows").innerHTML = rows.join("");
-  $("k1").textContent = opened; $("k2").textContent = totalOpens; $("k3").textContent = totalDl; $("k4").textContent = mins(totalSecs);
-  $("feed").innerHTML = feed.sort((a, b) => b.t - a.t).slice(0, 20).map(f => `<div>${f.txt} <span>· ${fmt(f.t)}</span></div>`).join("") || `<div><span>Aún no hay actividad.</span></div>`;
 }
 </script>
 </body></html>

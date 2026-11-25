@@ -2,7 +2,8 @@ import { FIREBASE } from "./firebase.js";
 const DOC = document.querySelector("meta[name=cotizacion]")?.content || "sin-doc";
 
 const code = (new URLSearchParams(location.search).get("c") || "sin-codigo").replace(/[^a-z0-9-]/gi, "").slice(0, 24) || "sin-codigo";
-const ready = FIREBASE.databaseURL && !FIREBASE.databaseURL.includes("PENDIENTE");
+const noTrack = new URLSearchParams(location.search).has("nt");
+const ready = !noTrack && FIREBASE.databaseURL && !FIREBASE.databaseURL.includes("PENDIENTE");
 
 function deviceId() {
   try {
@@ -43,7 +44,7 @@ async function start() {
 
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) seen.add(String([...document.querySelectorAll(".sheet")].indexOf(e.target) + 1));
-  }), { threshold: 0.35 });
+  }), { threshold: 0.15 });
   document.querySelectorAll(".sheet").forEach(s => io.observe(s));
 
   const dl = document.getElementById("dl");

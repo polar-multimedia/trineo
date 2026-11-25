@@ -1,9 +1,9 @@
 {
   "rules": {
     "trineo": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')",
       "tracking": {
         "$doc": {
-          ".read": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')",
           "visits": { "$code": { "$id": {
             ".write": "!data.exists() || data.child('device').val() === newData.child('device').val()",
             ".validate": "newData.hasChildren(['start','device'])"
@@ -15,7 +15,9 @@
         }
       },
       "directorio": {
-        ".read": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')",
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')"
+      },
+      "seguimiento": {
         ".write": "auth != null && auth.token.email_verified == true && auth.token.email.endsWith('@polarmultimedia.com')"
       }
     }
