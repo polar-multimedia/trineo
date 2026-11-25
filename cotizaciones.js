@@ -11,6 +11,6 @@ export const COTIZACIONES = {
     limite: "2026-11-30",
     pdf: "assets/Cotizacion-Carnot-Co-Rep-2027.pdf",
     secciones: ["Planes", "Inversión y capacidad", "Cómo funciona", "Interacciones y calendario", "Condiciones"],
-    codigos: ["ge1stj", "o1byri", "8oa4rg"]
+    codigos: ["equipo-snc", "ge1stj", "o1byri", "8oa4rg"]
   }
 };
