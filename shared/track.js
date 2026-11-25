@@ -19,7 +19,7 @@ async function start() {
   const db = getDatabase(initializeApp(FIREBASE));
   const dev = deviceId();
   const t0 = Date.now();
-  const visitRef = push(ref(db, `tracking/${DOC}/visits/${code}`));
+  const visitRef = push(ref(db, `trineo/tracking/${DOC}/visits/${code}`));
   const seen = new Set();
   await set(visitRef, {
     start: t0, last: t0, secs: 0, device: dev,
@@ -48,7 +48,7 @@ async function start() {
 
   const dl = document.getElementById("dl");
   if (dl) dl.addEventListener("click", () => {
-    push(ref(db, `tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev });
+    push(ref(db, `trineo/tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev });
   });
 }
 start().catch(e => console.warn("Seguimiento:", e));

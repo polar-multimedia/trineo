@@ -52,7 +52,7 @@ td b{color:var(--navy)}
 </div>
 </main>
 <script type="module">
-import { FIREBASE, ADMIN } from "../shared/firebase.js";
+import { FIREBASE, ADMIN_DOMAIN } from "../shared/firebase.js";
 import { COTIZACIONES } from "../cotizaciones.js";
 const $ = id => document.getElementById(id);
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -76,18 +76,18 @@ else {
   const app = initializeApp(FIREBASE), auth = getAuth(app); db = db(app);
   $("go").onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
   const { set } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
-  saveName = (c, name) => set(ref(db, `directorio/${current}/${c}/name`), name);
+  saveName = (c, name) => set(ref(db, `trineo/directorio/${current}/${c}/name`), name);
   let unsubDir = null;
   const watch = () => {
     if (unsub) unsub(); if (unsubDir) unsubDir();
     let last = {};
-    unsubDir = onValue(ref(db, `directorio/${current}`), snap => { DIR = snap.val() || {}; showLinks(); render(last); });
-    unsub = onValue(ref(db, `tracking/${current}`), snap => { last = snap.val() || {}; render(last); });
+    unsubDir = onValue(ref(db, `trineo/directorio/${current}`), snap => { DIR = snap.val() || {}; showLinks(); render(last); });
+    unsub = onValue(ref(db, `trineo/tracking/${current}`), snap => { last = snap.val() || {}; render(last); });
   };
   $("sel").onchange = e => { current = e.target.value; showLinks(); watch(); };
   onAuthStateChanged(auth, u => {
     if (!u) return;
-    if (u.email !== ADMIN) { $("msg").textContent = "Esta cuenta no tiene acceso al panel."; return; }
+    if (!(u.email || "").endsWith(ADMIN_DOMAIN)) { $("msg").textContent = "Esta cuenta no tiene acceso al panel."; return; }
     $("login").hidden = true; $("app").hidden = false; watch();
   });
 }
