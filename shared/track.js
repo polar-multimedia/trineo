@@ -48,7 +48,7 @@ async function start() {
   document.querySelectorAll(".sheet").forEach(s => io.observe(s));
 
   document.querySelectorAll(".dl").forEach(dl => dl.addEventListener("click", () => {
-    push(ref(db, `trineo/tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev }));
-  });
+    push(ref(db, `trineo/tracking/${DOC}/downloads/${code}`), { ts: Date.now(), device: dev });
+  }));
 }
 start().catch(e => console.warn("Seguimiento:", e));
