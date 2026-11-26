@@ -20,7 +20,7 @@ export const COTIZACIONES = {
     proyecto: "PULSO by Lacteol",
     tipo: "Reporte final",
     nota: "Un código por destinatario de la cadena (lo asigna el servidor de PULSO). DSM no ve la asistencia por representante.",
-    secciones: ["Cifras", "Cronología", "Programa académico", "Reto PULSO", "Por representante", "Fotografías", "Videomemoria"],
+    secciones: ["Cifras", "Cronología", "Programa académico", "Reto PULSO", "Comunicación", "Por representante", "Fotografías", "Videomemoria"],
     desde: 1795753800000, // 26 nov 2026 22:30 (CDMX): lo anterior son pruebas
     codigos: []
   },

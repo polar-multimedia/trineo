@@ -213,3 +213,93 @@ footer.site{position:relative;z-index:2;max-width:940px;margin:0 auto;padding:0 
  .vid{display:none}
  .priv{color:var(--mute)}
 }
+
+/* Fotos dentro de la cronología */
+.tl-ph{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 6px;max-width:560px}
+.tl-ph.n1{grid-template-columns:1fr;max-width:380px}
+.tl-ph.n2{grid-template-columns:1fr 1fr;max-width:480px}
+.tl-ph .ph{aspect-ratio:3/2;border-radius:12px;box-shadow:0 6px 18px rgba(26,58,92,.14)}
+.tl li.has-ph{padding-bottom:12px}
+@media (max-width:760px){.tl-ph,.tl-ph.n1,.tl-ph.n2{max-width:none}.tl-ph{grid-template-columns:1fr 1fr}.tl-ph.n1{grid-template-columns:1fr}}
+@media print{.tl-ph .ph{box-shadow:none}.tl li.has-ph{break-inside:avoid}}
+
+/* Encabezado de cada sección: foto del evento (o imagen de referencia del montaje) */
+.scene{position:relative;margin:-38px -42px 22px;aspect-ratio:1130/400;max-height:300px;width:calc(100% + 84px);border-radius:24px 24px 0 0;overflow:hidden;background:#071433 center/cover no-repeat}
+.scene::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,10,20,0) 30%,rgba(4,10,20,.82) 100%)}
+.scene .scr{position:absolute;left:30px;right:30px;bottom:20px}
+.scene .eyebrow{color:#7FE6E4}
+.scene h2{color:#fff;font-size:24px;margin-top:4px;text-shadow:0 2px 16px rgba(0,0,0,.5)}
+.scene h2::before{background:linear-gradient(90deg,#7FE6E4,#FF7AD0)}
+.scene.ref::after{content:"Imagen de referencia del montaje";position:absolute;top:12px;right:14px;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:#fff;background:rgba(4,10,20,.55);padding:4px 9px;border-radius:999px}
+.scene.real::after{content:none}
+.scene.real{cursor:zoom-in}
+
+/* Portada: imagen PULSO a la derecha */
+.h-vis{position:absolute;right:max(28px,calc((100vw - 1180px)/2));top:50%;transform:translateY(-50%);width:min(30vw,360px);aspect-ratio:9/16;border-radius:26px;overflow:hidden;opacity:0;animation:rise 1.2s .4s ease forwards;box-shadow:0 0 0 1px rgba(127,230,228,.35),0 30px 80px rgba(0,0,0,.5),0 0 80px rgba(78,203,202,.25)}
+.h-vis img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-in{z-index:2}
+
+/* Programa: una tarjeta por ponencia con su foto */
+.talks{display:grid;gap:14px}
+.talk{display:grid;grid-template-columns:240px 1fr;overflow:hidden;padding:0}
+.talk .im{position:relative;background:#071433 center/cover no-repeat;min-height:150px;border:0;padding:0;cursor:zoom-in}
+.talk .im.ref::after{content:"Escena de la Sala 360";position:absolute;left:8px;bottom:8px;font-size:10px;font-weight:800;color:#fff;background:rgba(4,10,20,.6);padding:3px 8px;border-radius:999px}
+.talk .tx{padding:14px 18px}
+.talk .hr{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mag)}
+.talk .sp{font-weight:800;color:var(--navy);font-size:16px;margin:3px 0 2px}
+.talk .tp{font-size:13.5px;color:var(--ink)}
+.talk .more{display:flex;gap:6px;margin-top:10px}
+.talk .more .ph{width:74px;aspect-ratio:3/2;border-radius:8px}
+
+/* Banda de marcas al final */
+.brand{position:relative;z-index:2;max-width:940px;margin:0 auto 22px;padding:0 24px}
+.brand{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:22px}
+.brand .mv{width:100%;border-radius:20px}
+.brand .bl{color:#E3F4F6}
+.brand .pl{height:58px;width:auto}
+.brand .row{display:flex;gap:20px;align-items:center;margin:14px 0 10px}
+.brand .row img{height:38px;width:auto}
+.brand p{font-size:13px;font-weight:700;color:#CFEDEE;margin:0}
+
+@media (max-width:1000px){.h-vis{display:none}}
+@media (max-width:760px){
+ .scene{margin:-26px -18px 18px;width:calc(100% + 36px);border-radius:18px 18px 0 0;aspect-ratio:16/9}
+ .scene .scr{left:18px;right:18px;bottom:14px}.scene h2{font-size:19px}
+ .talk{grid-template-columns:1fr}.talk .im{aspect-ratio:16/9;min-height:0}
+ .brand{grid-template-columns:110px 1fr;padding:0 12px;gap:14px}.brand .pl{height:40px}.brand .row img{height:28px}
+}
+@media print{
+ .scene{margin:-22px -24px 14px;width:calc(100% + 48px);max-height:200px;border-radius:0}
+ .scene.ref::after{background:rgba(4,10,20,.7)}
+ .h-vis{display:none}
+ .talk{break-inside:avoid}
+ .brand{max-width:none;padding:0;background:#071433;border-radius:16px;padding:16px;break-inside:avoid}
+}
+
+/* Ganadores: representante y botones */
+.win .rp{font-size:12.5px;color:var(--mute);margin-top:6px}
+.win .rp b{color:var(--navy)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.podium .btns{justify-content:center;margin-top:4px}
+
+/* Comunicación: correos enviados */
+.mails{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mail{display:grid;grid-template-columns:120px 1fr;gap:0;overflow:hidden;padding:0}
+.mail .mi{border:0;padding:0;background:#EEF2F8 top center/cover no-repeat;cursor:zoom-in;min-height:150px}
+.mail .mt{padding:14px 16px}
+.mail .hr{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mag)}
+.mail .sp{font-weight:800;color:var(--navy);font-size:15px;margin:3px 0 4px}
+.mail p{font-size:13px;margin:0;color:var(--ink)}
+.mail .btns{margin-top:10px}
+
+/* Lightbox para correos (imagen larga, con scroll) */
+.lb.doc{justify-content:flex-start;overflow-y:auto;padding:56px 16px 20px}
+.lb.doc img{max-height:none;max-width:min(640px,96vw);height:auto}
+.lb.doc .nav{display:none}
+
+/* Videomemoria vertical 9:16 */
+.vid{aspect-ratio:9/16;max-width:380px;margin:0 auto}
+
+@media (max-width:760px){.mails{grid-template-columns:1fr}.mail{grid-template-columns:96px 1fr}}
+@media print{.mail{break-inside:avoid}.btns{display:none}}
+.talk .im.ref{background-position:8% 50%}

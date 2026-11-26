@@ -24,12 +24,13 @@
       success: true, demo: true, who: { name: "Equipo Carnot", company: "Carnot Laboratorios", role: "carnot" },
       figures: { confirmados: 172, registrados: 139, asistentes: 125, enSitio: 14, porReto: 9, constancias: 121, jugadores: 112, puntos: 6, clave: "CMCP-PED-N26426" },
       arrivals: arr.map(function (a) { return { t: a[0], n: a[1] }; }),
-      timeline: tl.map(function (x) { return { time: x[0], label: x[1], key: !!x[2] }; }),
+      timeline: tl.map(function (x) { return { time: x[0], ts: Date.parse("2026-11-26T" + x[0] + ":00-06:00"), label: x[1], key: !!x[2] }; }),
       program: [["16:00", "El Observatorio", "Dra. María José Mendoza Tavera", "Diarrea aguda en pediatría: decisiones terapéuticas basadas en evidencia y estrategias para una recuperación intestinal efectiva"], ["16:30", "El Laboratorio", "Dr. Francisco Javier Otero Mendoza", "Antibióticos en pediatría: ¿cuándo sí, cuándo no y cómo proteger la salud intestinal?"], ["16:55", "El Arrecife", "Dra. Ana Teresa Abreu y Abreu", "Clasificación de los bioterapéuticos y su evidencia científica"], ["17:55", "El Jardín japonés", "Dr. Rodrigo Vázquez Frías", "De la evidencia clínica a la recuperación intestinal: el rol de Lactobacillus LB inactivados"], ["18:25", "La Mesa de Perspectivas", "Panel de expertos · modera Dr. Alfonso Copto", "¿Qué necesita realmente el intestino para su recuperación?"], ["19:10", "La Orilla", "Dr. José Antonio Chávez Barrera", "Dolor, diarrea, estreñimiento y estudios normales: Roma V llega al consultorio"], ["19:55", "Reto PULSO", "Cinco casos clínicos en tiempo real", "Becas para CONAPM 2027"]],
       reto: { perQuestion: [108, 111, 106, 109, 104].map(function (v, i) { return { q: "q" + (i + 1), n: v }; }), top: n.map(function (x, i) { return { place: i + 1, name: x, pts: 4720 - i * 260 - (i > 2 ? 120 : 0) }; }) },
-      winners: [0, 1, 2].map(function (i) { return { place: i + 1, name: n[i], pts: 4720 - i * 260, confirmed: i < 2, specialty: ["Pediatría", "Gastroenterología pediátrica", "Pediatría"][i], city: ["Ciudad de México", "Puebla", "Toluca"][i] }; }),
+      winners: [0, 1, 2].map(function (i) { return { place: i + 1, name: n[i], pts: 4720 - i * 260, confirmed: i < 2, specialty: ["Pediatría", "Gastroenterología pediátrica", "Pediatría"][i], city: ["Ciudad de México", "Puebla", "Toluca"][i], rep: "Representante de ejemplo " + (i + 1) }; }),
       byRep: [["Representante de ejemplo 1", 9, 8], ["Representante de ejemplo 2", 7, 6], ["Representante de ejemplo 3", 6, 6], ["Representante de ejemplo 4", 5, 3]].map(function (r) { return { rep: r[0], confirmados: r[1], asistieron: r[2] }; }),
-      photos: [], video: "", updated: new Date().toISOString()
+      photos: [["r-calle_noche.jpg", "Llegada y registro", "14:40"], ["r-escenario.jpg", "Ponencia · Dra. Mendoza (El Observatorio)", "16:10"], ["r-s360.jpg", "Ponencia · Dra. Abreu (El Arrecife)", "17:00"], ["r-booth.jpg", "Espacios y marca", "17:30"], ["r-dinamica.jpg", "Reto PULSO", "20:02"], ["r-cena.jpg", "Cena", "20:50"]].map(function (x, i) { return { id: "demo" + i, src: "assets/" + x[0], momento: x[1], caption: "Foto de ejemplo (render)", at: "2026-11-26T" + x[2] + ":00-06:00" }; }),
+      video: "", updated: new Date().toISOString()
     };
   }
 
@@ -80,17 +81,48 @@
       $("arr-note").textContent = "El momento de más afluencia fue a las " + peak.t + " h, con " + peak.n + " llegadas en 15 minutos.";
     } else { $("bars").parentNode.innerHTML = '<div class="empty">Las llegadas aparecerán aquí en cuanto se registren.</div>'; }
 
-    // 2 · Cronología
+    // 2 · Cronología (cada momento con sus fotos)
     var T = d.timeline || [];
-    $("tl").innerHTML = T.length ? T.map(function (x) {
+    P = d.photos || [];
+    var byItem = photosForTimeline(T, P);
+    $("tl").innerHTML = T.length ? T.map(function (x, j) {
       var k = x.key || /Reto|constancias|ganador/i.test(x.label);
-      return '<li class="' + (k ? "key" : "") + '"><time>' + esc(x.time) + '</time><span class="dot"></span><span class="t">' + esc(x.label) + (x.pc ? "<small>" + x.pc + " médicos conectados al Reto</small>" : "") + "</span></li>";
+      var ph = (byItem[j] || []).slice(0, 3);
+      return '<li class="' + (k ? "key" : "") + (ph.length ? " has-ph" : "") + '"><time>' + esc(x.time) + '</time><span class="dot"></span><span class="t">' + esc(x.label) + (x.pc ? "<small>" + x.pc + " médicos conectados al Reto</small>" : "") +
+        (ph.length ? '<span class="tl-ph n' + ph.length + '">' + ph.map(function (i) { return '<button class="ph" data-i="' + i + '" type="button"><img alt="' + esc(P[i].momento || "PULSO") + '"></button>'; }).join("") + "</span>" : "") + "</span></li>";
     }).join("") : '<li><span></span><span></span><span class="t mute">La cronología se llena sola durante el evento.</span></li>';
+    lazyPhotos($("tl"));
 
     // 3 · Programa
     $("prog-sub").textContent = "Coordinador: Dr. Alfonso Copto · " + (f.puntos || 6) + " puntos curriculares " + (f.clave || "");
-    $("prog").innerHTML = "<tr><th>Hora</th><th>Paisaje</th><th>Ponente y tema</th></tr>" + (d.program || []).map(function (p) {
-      return '<tr><td class="k">' + esc(p[0]) + '</td><td class="who">' + esc(p[1]) + "</td><td><b>" + esc(p[2]) + "</b><small>" + esc(p[3]) + "</small></td></tr>";
+    var talkPh = photosForTalks(d.program || [], P);
+    $("prog").innerHTML = (d.program || []).map(function (t, j) {
+      var ph = talkPh[j] || [], first = ph[0], scene = SCENE[t[1]];
+      var im = first != null ? '<button class="im ph" data-i="' + first + '" type="button"><img alt="' + esc(t[2]) + '"></button>'
+        : '<button class="im ref" type="button" data-img="' + (scene || "e03") + '" data-cap="' + esc(t[1]) + ' · escena de la Sala 360" style="background-image:url(assets/' + (scene || "e03") + '.jpg)"></button>';
+      return '<div class="glass talk">' + im + '<div class="tx"><div class="hr">' + esc(t[0]) + " · " + esc(t[1]) + '</div><div class="sp">' + esc(t[2]) + '</div><div class="tp">' + esc(t[3]) + "</div>" +
+        (ph.length > 1 ? '<div class="more">' + ph.slice(1, 5).map(function (i) { return '<button class="ph" data-i="' + i + '" type="button"><img alt=""></button>'; }).join("") + "</div>" : "") + "</div></div>";
+    }).join("");
+    lazyPhotos($("prog"));
+
+    // Encabezados: la foto destacada (o la primera) de su momento; si no hay, la imagen de referencia
+    document.querySelectorAll(".scene[data-mom]").forEach(function (el) {
+      var mm = el.dataset.mom, pick = -1;
+      P.forEach(function (p, i) { if (String(p.momento || "").indexOf(mm) === 0 && (pick < 0 || (p.star && !P[pick].star))) pick = i; });
+      if (pick < 0) return;
+      thumb(pick).then(function (u) { if (!u) return; el.style.backgroundImage = "url(" + u + ")"; el.classList.remove("ref"); el.classList.add("real"); el.onclick = function () { openLb(pick); }; });
+    });
+
+    // 5 · Comunicación
+    var C = [["correo-constancia", "Constancia", (f.constancias ? fmt(f.constancias) + " médicos" : "Cada médico asistente") + " · 20:40 h", "Su constancia en PDF, lista para descargar, reenviar o corregir su nombre.", "constancia-muestra", "Ver la constancia"],
+      ["correo-ganador", "Ganadores del Reto", "3 médicos · al confirmar producción", "Felicitación, sus puntos y confirmación de datos para gestionar la beca."],
+      ["correo-repre-hoy", "Representantes · día del evento", "9:00 h", "«Hoy es PULSO»: la lista de sus médicos confirmados y su liga de seguimiento."],
+      ["correo-gracias", "Agradecimiento a los asistentes", "Al cierre", "Gracias por ser parte de PULSO, con la videomemoria."],
+      ["correo-repre-resultados", "Resultados a cada representante", "Al cierre", "Su página con los médicos que llegaron, su Reto, becas y constancias."],
+      ["correo-reporte", "Reporte final a la cadena", "Al cierre", "Este reporte, con una liga para cada destinatario."]];
+    $("mails").innerHTML = C.map(function (c) {
+      return '<div class="glass mail"><button class="mi" type="button" data-img="' + c[0] + '" data-cap="' + esc(c[1]) + ' (datos de ejemplo)" style="background-image:url(assets/' + c[0] + '.jpg)"></button><div class="mt"><div class="hr">' + esc(c[2]) + '</div><div class="sp">' + esc(c[1]) + '</div><p>' + esc(c[3]) + '</p><div class="btns"><button class="btn sm" type="button" data-img="' + c[0] + '" data-cap="' + esc(c[1]) + ' (datos de ejemplo)">Ver correo</button>' +
+        (c[4] ? '<button class="btn sm ghost" type="button" data-img="' + c[4] + '" data-cap="Constancia (machote con nombre de ejemplo)">' + c[5] + "</button>" : "") + "</div></div></div>";
     }).join("");
 
     // 4 · Reto
@@ -99,8 +131,8 @@
     var W = (d.winners || []).slice().sort(function (a, b) { return a.place - b.place; });
     $("podium").innerHTML = W.length ? W.map(function (w) {
       return '<div class="glass win' + (w.place == 1 ? " first" : "") + '"><div class="medal">' + w.place + '</div><div class="pl">' + ({ 1: "1.er", 2: "2.º", 3: "3.er" }[w.place] || w.place + ".º") + ' lugar</div>' +
-        '<div class="nm">' + esc(w.name) + '</div><div class="sp">' + esc([w.specialty, w.city].filter(Boolean).join(" · ")) + '</div><div class="pt">' + fmt(w.pts) + ' pts</div><div class="ok"><span class="chip ' + (w.confirmed ? "" : "gray") + '">' + (w.confirmed ? "Confirmó sus datos" : "Por confirmar sus datos") + "</span></div></div>";
-    }).join("") : '<div class="empty" style="grid-column:1/-1">Los ganadores aparecerán aquí cuando producción confirme y envíe el aviso.</div>';
+        '<div class="nm">' + esc(w.name) + '</div><div class="sp">' + esc([w.specialty, w.city].filter(Boolean).join(" · ")) + '</div>' + (w.rep ? '<div class="rp">Representante: <b>' + esc(w.rep) + "</b></div>" : "") + '<div class="pt">' + fmt(w.pts) + ' pts</div><div class="ok"><span class="chip ' + (w.confirmed ? "" : "gray") + '">' + (w.confirmed ? "Confirmó sus datos" : "Por confirmar sus datos") + "</span></div></div>";
+    }).join("") + '<div class="btns" style="grid-column:1/-1"><button class="btn sm ghost" type="button" data-img="correo-ganador" data-cap="Correo de felicitación a cada ganador (datos de ejemplo)">Ver el correo que recibieron</button><button class="btn sm ghost" type="button" data-img="correo-repre-resultados" data-cap="Aviso al representante cuando su médico gana (datos de ejemplo)">Ver el aviso a su representante</button></div>' : '<div class="empty" style="grid-column:1/-1">Los ganadores aparecerán aquí cuando producción confirme y envíe el aviso.</div>';
     var qmx = Math.max.apply(null, Q.map(function (q) { return q.n; }).concat([1]));
     $("qbars").innerHTML = Q.length ? Q.map(function (q, i) { return '<div class="qbar"><span>Caso ' + (i + 1) + '</span><div class="meter"><i data-w="' + Math.round(q.n / (f.jugadores || qmx) * 100) + '"></i></div><b>' + q.n + "</b></div>"; }).join("") + '<p class="mute" style="font-size:12px;margin:10px 0 0">Respuestas recibidas en cada caso.</p>' : '<div class="mute">Aún no hay respuestas.</div>';
     whenSeen($("qbars"), function () { document.querySelectorAll("#qbars .meter i").forEach(function (el) { el.style.width = Math.min(100, el.dataset.w) + "%"; }); });
@@ -127,8 +159,66 @@
     $("vid").prepend(v);
   }
 
-  // ─── Galería: las fotos llegan del servidor de PULSO, de pocas en pocas ───
-  var P = [], cur = 0;
+  // ─── Fotos: llegan del servidor de PULSO, de pocas en pocas, y se reutilizan en la cronología y la galería ───
+  var P = [], cur = 0, q = [], busy = 0, wait = {};
+  function thumb(i) {
+    if (P[i].thumb) return Promise.resolve(P[i].thumb);
+    if (P[i].src) { P[i].thumb = P[i].src; return Promise.resolve(P[i].src); }
+    if (wait[i]) return wait[i];
+    wait[i] = new Promise(function (ok) { q.push([i, ok]); pump(); });
+    return wait[i];
+  }
+  function pump() {
+    while (busy < 3 && q.length) {
+      var it = q.shift(); busy++;
+      (function (i, ok) {
+        call({ action: "photo", k: key, id: P[i].id, w: 900 }).then(function (r) { if (r && r.success) P[i].thumb = "data:" + r.mime + ";base64," + r.data; })
+          .catch(function () {}).then(function () { busy--; ok(P[i].thumb || ""); pump(); });
+      })(it[0], it[1]);
+    }
+  }
+  function lazyPhotos(root) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) {
+      if (!e.isIntersecting) return; io.unobserve(e.target); var el = e.target;
+      thumb(+el.dataset.i).then(function (u) { if (!u) return; var im = el.querySelector("img"); im.onload = function () { im.classList.add("on"); el.style.animation = "none"; }; im.src = u; });
+    }); }, { rootMargin: "300px" });
+    root.querySelectorAll(".ph").forEach(function (el) { io.observe(el); el.onclick = function () { openLb(+el.dataset.i); }; });
+  }
+  /* A qué momento de la cronología va cada foto: primero por el momento que eligió quien la subió
+     (Reto, ganadores, cena, llegada); si no, por la hora en que se subió. */
+  function photosForTimeline(T, list) {
+    var out = {}, ts = T.map(function (x) { return x.ts || 0; });
+    var find = function (re) { for (var j = 0; j < T.length; j++) if (re.test(T[j].label)) return j; return -1; };
+    var M = { "Reto PULSO": find(/^Reto PULSO/i), "Ganadores": find(/ganador/i), "Cena": find(/^Cena/i), "Llegada y registro": find(/primer médico|registro/i), "Panel": find(/Mesa de Perspectivas|Panel/i) };
+    ["El Observatorio", "El Laboratorio", "El Arrecife", "El Jardín japonés", "La Mesa de Perspectivas", "La Orilla"].forEach(function (n) { var j = find(new RegExp(n)); list.forEach(function (p) { if (String(p.momento || "").indexOf(n) >= 0) M[p.momento] = j; }); });
+    list.forEach(function (p, i) {
+      var j = M[p.momento] != null ? M[p.momento] : -1;
+      if (j < 0) { var t = Date.parse(p.at || ""); if (!t) return; for (var k = 0; k < T.length; k++) if (ts[k] && ts[k] <= t) j = k; }
+      if (j < 0) return;
+      (out[j] = out[j] || []).push(i);
+    });
+    return out;
+  }
+  var SCENE = { "El Observatorio": "e03", "El Laboratorio": "e04", "El Arrecife": "e05", "El Jardín japonés": "e07", "La Mesa de Perspectivas": "e08", "La Orilla": "e09", "Reto PULSO": "e10" };
+  /* Fotos de cada ponencia: las que se subieron con su nombre; si no, las genéricas tomadas durante su horario. */
+  function photosForTalks(prog, list) {
+    var out = {}, day = "2026-11-26T";
+    var st = prog.map(function (t) { return Date.parse(day + t[0] + ":00-06:00"); });
+    list.forEach(function (p, i) {
+      var m = String(p.momento || ""), j = -1;
+      prog.forEach(function (t, k) { if (j < 0 && t[1] && m.indexOf(t[1]) >= 0) j = k; });
+      if (j < 0 && /^Ponencia$|^Ponencias$|^Panel$/.test(m)) { var at = Date.parse(p.at || ""); prog.forEach(function (t, k) { if (at >= st[k] && (k === prog.length - 1 || at < st[k + 1])) j = k; }); }
+      if (j < 0) return;
+      (out[j] = out[j] || []).push(i);
+    });
+    Object.keys(out).forEach(function (k) { out[k].sort(function (a, b) { return (list[b].star ? 1 : 0) - (list[a].star ? 1 : 0); }); });
+    return out;
+  }
+  function openImg(name, cap) {
+    var u = /^(https?:|data:)/.test(name) ? name : "assets/" + name + ".jpg";
+    cur = -1; $("lbimg").src = u; $("lbcap").textContent = cap || ""; $("lbdl").href = u; $("lb").classList.add("on", "doc");
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-img]"); if (b) openImg(b.dataset.img, b.dataset.cap); });
   function photos(list, isDemo) {
     var g = $("gal");
     if (!list.length) {
@@ -136,30 +226,20 @@
       return;
     }
     $("fot-sub").textContent = list.length + " fotografías · toque una para verla completa o descargarla.";
-    P = list;
     g.innerHTML = list.map(function (p, i) { return '<button class="ph' + (i % 7 === 0 ? " big" : "") + '" data-i="' + i + '" type="button"><img alt="' + esc(p.caption || p.momento || "PULSO") + '">' + (p.caption || p.momento ? "<figcaption>" + esc(p.caption || p.momento) + "</figcaption>" : "") + "</button>"; }).join("");
-    var queue = [], busy = 0;
-    function pump() {
-      while (busy < 3 && queue.length) {
-        var el = queue.shift(), i = +el.dataset.i; busy++;
-        call({ action: "photo", k: key, id: P[i].id, w: 900 }).then(function (el, i) { return function (r) {
-          if (r && r.success) { var im = el.querySelector("img"); P[i].thumb = "data:" + r.mime + ";base64," + r.data; im.onload = function () { im.classList.add("on"); el.style.animation = "none"; }; im.src = P[i].thumb; }
-        }; }(el, i)).catch(function () {}).then(function () { busy--; pump(); });
-      }
-    }
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); queue.push(e.target); pump(); } }); }, { rootMargin: "300px" });
-    g.querySelectorAll(".ph").forEach(function (el) { io.observe(el); el.onclick = function () { openLb(+el.dataset.i); }; });
+    lazyPhotos(g);
   }
   function openLb(i) {
     cur = (i + P.length) % P.length; var p = P[cur];
-    $("lbimg").src = p.thumb || ""; $("lbcap").textContent = [p.momento, p.caption].filter(Boolean).join(" · ");
-    $("lbdl").href = p.thumb || "#"; $("lb").classList.add("on");
+    $("lbimg").src = p.thumb || p.src || ""; if (!p.thumb && !p.src) thumb(cur).then(function (u) { if (P[cur] === p) { $("lbimg").src = u; $("lbdl").href = u; } }); $("lbcap").textContent = [p.momento, p.caption].filter(Boolean).join(" · ");
+    $("lbdl").href = p.thumb || "#"; $("lb").classList.remove("doc"); $("lb").classList.add("on");
+    if (p.src) return;
     call({ action: "photo", k: key, id: p.id, w: 2000 }).then(function (r) { if (r && r.success && cur === i % P.length) { var u = "data:" + r.mime + ";base64," + r.data; p.full = u; $("lbimg").src = u; $("lbdl").href = u; } }).catch(function () {});
   }
   $("lbx").onclick = function () { $("lb").classList.remove("on"); };
-  $("lbp").onclick = function () { openLb(cur - 1); };
-  $("lbn").onclick = function () { openLb(cur + 1); };
-  addEventListener("keydown", function (e) { if (!$("lb").classList.contains("on")) return; if (e.key === "Escape") $("lbx").onclick(); if (e.key === "ArrowLeft") openLb(cur - 1); if (e.key === "ArrowRight") openLb(cur + 1); });
+  $("lbp").onclick = function () { if (cur >= 0) openLb(cur - 1); };
+  $("lbn").onclick = function () { if (cur >= 0) openLb(cur + 1); };
+  addEventListener("keydown", function (e) { if (!$("lb").classList.contains("on")) return; if (e.key === "Escape") $("lbx").onclick(); if (cur < 0) return; if (e.key === "ArrowLeft") openLb(cur - 1); if (e.key === "ArrowRight") openLb(cur + 1); });
 
   $("print").onclick = function () { window.print(); };
 

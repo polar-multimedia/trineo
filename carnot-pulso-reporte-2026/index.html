@@ -14,6 +14,7 @@
     <p class="h-lead">Cifras, cronología, programa académico, Reto PULSO, fotografías y videomemoria de PULSO by Lacteol.</p>
     <div class="h-cta"><a class="btn glow" href="#cifras">Ver el reporte</a><button class="btn line dl" id="print" type="button">Guardar en PDF</button><span id="h-upd"></span></div>
   </div>
+  <div class="h-vis" aria-hidden="true"><img src="assets/portal.jpg" alt=""></div>
   <a class="h-scroll" href="#cifras" aria-label="Bajar al reporte"><i></i></a>
   <div class="ice" aria-hidden="true">
     <div class="ice-p ice-l"></div><div class="ice-p ice-r"></div>
@@ -31,8 +32,7 @@
 
 <main id="cifras">
 <section class="sheet" data-reveal id="s-cifras">
-  <div class="eyebrow">1 · Cifras del evento</div>
-  <h2>Así llegó PULSO</h2>
+  <div class="scene ref" data-mom="Llegada y registro" style="background-image:url(assets/r-calle_noche.jpg)"><div class="scr"><div class="eyebrow">1 · Cifras del evento</div><h2>Así llegó PULSO</h2></div></div>
   <p class="sub" id="cif-sub">Registro, llegada y constancias, con datos del sistema de acceso.</p>
   <div class="kpis" id="kpis"></div>
   <h3>Llegadas cada 15 minutos</h3>
@@ -41,22 +41,19 @@
 </section>
 
 <section class="sheet long" data-reveal id="s-tl">
-  <div class="eyebrow">2 · Cronología</div>
-  <h2>Lo que pasó, a la hora en que pasó</h2>
+  <div class="scene ref" data-mom="Espacios y marca" style="background-image:url(assets/r-s360.jpg)"><div class="scr"><div class="eyebrow">2 · Cronología</div><h2>Lo que pasó, a la hora en que pasó</h2></div></div>
   <p class="sub">Registrado en vivo por el sistema: cada cambio de escena en la Sala 360, el Reto y los envíos.</p>
   <ul class="tl" id="tl"></ul>
 </section>
 
 <section class="sheet" data-reveal id="s-prog">
-  <div class="eyebrow">3 · Programa académico</div>
-  <h2>Seis paisajes, seis conversaciones</h2>
+  <div class="scene ref" data-mom="Ponencia" style="background-image:url(assets/r-escenario.jpg)"><div class="scr"><div class="eyebrow">3 · Programa académico</div><h2>Seis paisajes, seis conversaciones</h2></div></div>
   <p class="sub" id="prog-sub"></p>
-  <div class="glass tbl scroll"><table id="prog"></table></div>
+  <div class="talks" id="prog"></div>
 </section>
 
 <section class="sheet" data-reveal id="s-reto">
-  <div class="eyebrow">4 · Reto PULSO</div>
-  <h2>Cinco casos clínicos en tiempo real</h2>
+  <div class="scene ref" data-mom="Reto PULSO" style="background-image:url(assets/r-dinamica.jpg)"><div class="scr"><div class="eyebrow">4 · Reto PULSO</div><h2>Cinco casos clínicos en tiempo real</h2></div></div>
   <p class="sub" id="reto-sub"></p>
   <h3 style="margin-top:6px">Ganadores de las becas para CONAPM 2027</h3>
   <div class="podium" id="podium"></div>
@@ -67,27 +64,32 @@
   <p class="mute" style="margin-top:12px;font-size:13px">En caso de empate gana quien respondió más rápido en total.</p>
 </section>
 
+<section class="sheet" data-reveal id="s-com">
+  <div class="scene ref" data-mom="Espacios y marca" style="background-image:url(assets/r-recepcion.jpg)"><div class="scr"><div class="eyebrow">5 · Comunicación</div><h2>Lo que recibió cada quien</h2></div></div>
+  <p class="sub">Cada médico, representante y miembro del equipo recibió su correo en el momento justo, con su información. Toque «Ver correo» para ver cada uno (con datos de ejemplo).</p>
+  <div class="mails" id="mails"></div>
+</section>
+
 <section class="sheet" data-reveal id="s-rep">
-  <div class="eyebrow">5 · Por representante</div>
-  <h2>Asistencia de cada cartera</h2>
+  <div class="scene ref" data-mom="Comida" style="background-image:url(assets/r-booth.jpg)"><div class="scr"><div class="eyebrow">6 · Por representante</div><h2>Asistencia de cada cartera</h2></div></div>
   <p class="sub">Médicos confirmados por cada representante y cuántos llegaron al evento.</p>
   <div class="glass tbl scroll"><table id="reps"></table></div>
 </section>
 
 <section class="sheet long" data-reveal id="s-fotos">
-  <div class="eyebrow">6 · Fotografías</div>
-  <h2>La tarde en imágenes</h2>
+  <div class="scene ref" data-mom="Cena" style="background-image:url(assets/r-cena.jpg)"><div class="scr"><div class="eyebrow">7 · Fotografías</div><h2>La tarde en imágenes</h2></div></div>
   <p class="sub" id="fot-sub">Toque una foto para verla completa o descargarla.</p>
   <div class="gal" id="gal"></div>
 </section>
 
 <section class="sheet" data-reveal id="s-video">
-  <div class="eyebrow">7 · Videomemoria</div>
-  <h2>PULSO en tres minutos</h2>
-  <p class="sub">La misma videomemoria que recibieron los médicos asistentes.</p>
+  <div class="scene ref" data-mom="Ganadores" style="background-image:url(assets/r-recepcion.jpg)"><div class="scr"><div class="eyebrow">8 · Videomemoria</div><h2>La videomemoria de PULSO</h2></div></div>
+  <p class="sub">En vertical, para verla y compartirla desde el celular. Es la misma que recibieron los médicos asistentes.</p>
   <div class="vid" id="vid"><div class="soon" id="vsoon"><b>La videomemoria llega muy pronto</b><span>La estamos terminando con el material de la tarde. Esta misma liga la mostrará en cuanto esté lista.</span></div></div>
 </section>
 </main>
+
+<div class="brand" aria-label="PULSO by Lacteol · Carnot Laboratorios"><img class="mv" src="assets/microbiota.webp" alt=""><div class="bl"><img class="pl" src="assets/pulso-logo.png" alt="PULSO by Lacteol"><div class="row"><img src="assets/lacteol-fort-blanco.png" alt="Lacteol Fort"><img src="assets/carnot-blanco.png" alt="Carnot Laboratorios"></div><p>PULSO by Lacteol · El ritmo natural de la recuperación intestinal · 26 de noviembre de 2026 · InSpace, Ciudad de México</p></div></div>
 
 <div class="lb" id="lb" role="dialog" aria-label="Fotografía"><button class="x" id="lbx" aria-label="Cerrar">×</button><button class="nav prev" id="lbp" aria-label="Anterior">‹</button><img id="lbimg" alt=""><div class="cap" id="lbcap"></div><div class="row"><a class="btn sm" id="lbdl" download="PULSO-foto.jpg">Descargar</a></div><button class="nav next" id="lbn" aria-label="Siguiente">›</button></div>
 
