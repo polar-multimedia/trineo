@@ -29,6 +29,7 @@
       reto: { perQuestion: [108, 111, 106, 109, 104].map(function (v, i) { return { q: "q" + (i + 1), n: v }; }), top: n.map(function (x, i) { return { place: i + 1, name: x, pts: 4720 - i * 260 - (i > 2 ? 120 : 0) }; }) },
       winners: [0, 1, 2].map(function (i) { return { place: i + 1, name: n[i], pts: 4720 - i * 260, confirmed: i < 2, specialty: ["Pediatría", "Gastroenterología pediátrica", "Pediatría"][i], city: ["Ciudad de México", "Puebla", "Toluca"][i], rep: "Representante de ejemplo " + (i + 1) }; }),
       byRep: [["Representante de ejemplo 1", 9, 8], ["Representante de ejemplo 2", 7, 6], ["Representante de ejemplo 3", 6, 6], ["Representante de ejemplo 4", 5, 3]].map(function (r) { return { rep: r[0], confirmados: r[1], asistieron: r[2] }; }),
+      vivo: { ahora: { n: "El Arrecife · Dra. Ana Teresa Abreu y Abreu", what: "", time: "16:55" }, viajes: [["Dr. Jorge Alberto Méndez Ríos", "Durango", 1, "07:45", "here"], ["Dr. Ricardo Salinas Peña", "Tampico", 1, "10:05", "here"], ["Dr. Héctor Iván Ruiz Gómez", "Tapachula", 1, "11:15", "delay", 35], ["Dra. Paola Andrea Núñez Cruz", "Los Mochis", 1, "13:10", "air"], ["Dr. Óscar Medina Solís", "Pachuca", 0, "", "pick"]].map(function (x) { return { name: x[0], from: x[1], air: !!x[2], eta: x[3], s: x[4], d: x[5] || 0 }; }) },
       photos: [["r-calle_noche.jpg", "Llegada y registro", "14:40"], ["r-escenario.jpg", "Ponencia · Dra. Mendoza (El Observatorio)", "16:10"], ["r-s360.jpg", "Ponencia · Dra. Abreu (El Arrecife)", "17:00"], ["r-booth.jpg", "Espacios y marca", "17:30"], ["r-dinamica.jpg", "Reto PULSO", "20:02"], ["r-cena.jpg", "Cena", "20:50"]].map(function (x, i) { return { id: "demo" + i, src: "assets/" + x[0], momento: x[1], caption: "Foto de ejemplo (render)", at: "2026-11-26T" + x[2] + ":00-06:00" }; }),
       video: "", updated: new Date().toISOString()
     };
@@ -46,7 +47,28 @@
     io.observe(el);
   }
 
+  function vivo(d) {
+    var V = d.vivo, sec = $("s-vivo");
+    if (!V) { sec.hidden = true; return; }
+    sec.hidden = false; sec.classList.add("in");
+    $("para-cargo").textContent = "PULSO by Lacteol · en vivo";
+    var up = new Date(d.updated || Date.now());
+    $("vivo-sub").textContent = "Actualizado a las " + up.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false }) + " h · se actualiza solo cada minuto. Al cierre, esta misma liga se convierte en el reporte final.";
+    var f = d.figures || {}, a = V.ahora;
+    $("vivo-ahora").innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:baseline"><div><div class="eyebrow">Llegaron</div><div style="font-weight:800;font-size:34px;color:var(--navy);line-height:1">' + fmt(f.asistentes) + '<span style="font-size:15px;color:var(--mute)"> de ' + fmt(f.confirmados) + ' confirmados</span></div></div>' +
+      (a ? '<div style="flex:1;min-width:220px"><div class="eyebrow">En la Sala 360 desde las ' + esc(a.time) + '</div><div style="font-weight:800;font-size:17px;color:var(--navy)">' + esc(a.n) + '</div>' + (a.what && !/sin señal/i.test(a.what) ? '<div class="mute" style="font-weight:700">' + esc(a.what) + '</div>' : '') + '</div>' : '<div class="mute" style="font-weight:700">El programa arranca a las 16:00.</div>') + '</div>';
+    var T = V.viajes || [];
+    if (!T.length) { $("vivo-h").hidden = true; $("vivo-viajes").hidden = true; return; }
+    var LBL = { prog: ["Programado", "gray"], air: ["En vuelo", ""], delay: ["Retrasado", "warn"], land: ["Aterrizó", ""], pick: ["Con el chofer", ""], done: ["Entregado", ""], here: ["Ya está en PULSO", ""] };
+    T = T.slice().sort(function (x, y) { return (x.s === "here") - (y.s === "here") || String(x.eta).localeCompare(String(y.eta)); });
+    $("vivo-viajes").innerHTML = T.map(function (t) {
+      var l = LBL[t.s] || LBL.prog;
+      return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)"><div style="flex:1;min-width:0"><div class="who" style="font-weight:800;color:var(--navy)">' + esc(t.name) + '</div><div class="mute" style="font-size:13px;font-weight:700">' + esc(t.from) + ' · ' + (t.air ? "en avión" : "por tierra") + (t.eta ? " · llega " + esc(t.eta) : "") + '</div></div><span class="chip ' + l[1] + '" style="flex:none">' + l[0] + (t.s === "delay" && t.d ? " +" + t.d + " min" : "") + "</span></div>";
+    }).join("");
+  }
+
   function render(d) {
+    vivo(d);
     var f = d.figures || {};
     var who = d.who || {};
     if (who.name) { $("para-nombre").textContent = who.name; document.title = "PULSO by Lacteol · Reporte final para " + who.name; }
@@ -153,6 +175,7 @@
     photos(d.photos || [], !!d.demo);
 
     // 7 · Video
+    if ($("vid").querySelector("video")) return;
     var src = d.video || VIDEO, v = document.createElement("video");
     v.controls = true; v.preload = "metadata"; v.playsInline = true; v.src = src; v.hidden = true;
     v.addEventListener("loadedmetadata", function () { v.hidden = false; $("vsoon").remove(); });
@@ -252,5 +275,6 @@
   call({ action: "reportData", k: key }).then(function (d) {
     if (!d || !d.success) return fail(d && d.message ? d.message : "La liga no es válida.");
     $("load").remove(); render(d);
+    if (d.vivo) setInterval(function () { if (document.hidden) return; call({ action: "reportData", k: key }).then(function (n) { if (n && n.success) { vivo(n); if (!n.vivo) location.reload(); } }).catch(function () {}); }, 60000);
   }).catch(function () { fail("No hubo conexión con el servidor. Revise su internet e intente de nuevo."); });
 })();
