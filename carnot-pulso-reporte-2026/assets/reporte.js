@@ -6,6 +6,7 @@
   var qs = new URLSearchParams(location.search);
   var key = (qs.get("c") || "").replace(/[^a-z0-9-]/gi, "").slice(0, 24);
   var demo = !key || key === "prueba" || qs.has("demo");
+  var NT = qs.has("nt") ? 1 : 0;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var fmt = function (n) { return Number(n || 0).toLocaleString("es-MX"); };
@@ -29,7 +30,10 @@
       reto: { perQuestion: [108, 111, 106, 109, 104].map(function (v, i) { return { q: "q" + (i + 1), n: v }; }), top: n.map(function (x, i) { return { place: i + 1, name: x, pts: 4720 - i * 260 - (i > 2 ? 120 : 0) }; }) },
       winners: [0, 1, 2].map(function (i) { return { place: i + 1, name: n[i], pts: 4720 - i * 260, confirmed: i < 2, specialty: ["Pediatría", "Gastroenterología pediátrica", "Pediatría"][i], city: ["Ciudad de México", "Puebla", "Toluca"][i], rep: "Representante de ejemplo " + (i + 1) }; }),
       byRep: [["Representante de ejemplo 1", 9, 8], ["Representante de ejemplo 2", 7, 6], ["Representante de ejemplo 3", 6, 6], ["Representante de ejemplo 4", 5, 3]].map(function (r) { return { rep: r[0], confirmados: r[1], asistieron: r[2] }; }),
-      vivo: { ahora: { n: "El Arrecife · Dra. Ana Teresa Abreu y Abreu", what: "", time: "16:55" }, viajes: [["Dr. Jorge Alberto Méndez Ríos", "Durango", 1, "07:45", "here"], ["Dr. Ricardo Salinas Peña", "Tampico", 1, "10:05", "here"], ["Dr. Héctor Iván Ruiz Gómez", "Tapachula", 1, "11:15", "delay", 35], ["Dra. Paola Andrea Núñez Cruz", "Los Mochis", 1, "13:10", "air"], ["Dr. Óscar Medina Solís", "Pachuca", 0, "", "pick"]].map(function (x) { return { name: x[0], from: x[1], air: !!x[2], eta: x[3], s: x[4], d: x[5] || 0 }; }) },
+      vivo: { agenda: [["13:30", "Llegan los médicos foráneos", "Del hotel y del aeropuerto a InSpace Del Valle"], ["14:00", "Registro y bienvenida", "Check-in con QR en la entrada"], ["14:30", "Comida", "Terraza"], ["16:00", "El Observatorio · Dra. María José Mendoza Tavera", "Diarrea aguda en pediatría"], ["16:55", "El Arrecife · Dra. Ana Teresa Abreu y Abreu", "Clasificación de los bioterapéuticos"], ["19:55", "Reto PULSO", "Cinco casos clínicos en tiempo real"], ["20:40", "Cena", "Salen las constancias por correo a cada médico"], ["22:40", "Cierre", "Llega el reporte final a esta misma liga"]],
+        hitos: [{ t: "Bienvenida a la cadena", d: "Enviada a las 08:00", s: "ok" }, { t: "Montaje verificado", d: "3 de 8 zonas listas · última: Mesas y comida (13:52, Vero)", s: "now", montaje: [{ item: "Sala 360 y escenario", ok: true, por: "Vero", at: "12:41", hora: "12:30", fotos: [] }, { item: "Registro y entrada", ok: true, por: "Blanca", at: "13:20", hora: "13:30", fotos: [] }, { item: "Mesas y comida", ok: true, por: "Vero", at: "13:52", hora: "14:00", fotos: [] }, { item: "Arreglos florales y decoración", ok: false, hora: "14:00" }, { item: "Cena montada", ok: false, hora: "20:30" }] }, { t: "Registro de médicos", d: "125 ya llegaron", s: "ok" }, { t: "Reto PULSO", d: "112 médicos jugando", s: "ok" },
+          { t: "Correo a los ganadores", d: "Sale en unos minutos", s: "now", at: new Date(Date.now() + 4 * 60000).toISOString(), win: [{ place: 1, name: n[0], pts: 4720 }, { place: 2, name: n[1], pts: 4460 }, { place: 3, name: n[2], pts: 4200 }], ok: [{ name: "Equipo de ejemplo", time: "20:02" }] }, { t: "Constancias a los médicos", d: "Salen a las 20:40", s: "next", ver: "constancia" }, { t: "Reporte final", d: "Llega a esta liga a las 22:40", s: "next" }],
+        ahora: { n: "El Arrecife · Dra. Ana Teresa Abreu y Abreu", what: "", time: "16:55" }, viajes: [["Dr. Jorge Alberto Méndez Ríos", "Durango", 1, "07:45", "here"], ["Dr. Ricardo Salinas Peña", "Tampico", 1, "10:05", "here"], ["Dr. Héctor Iván Ruiz Gómez", "Tapachula", 1, "11:15", "delay", 35], ["Dra. Paola Andrea Núñez Cruz", "Los Mochis", 1, "13:10", "air"], ["Dr. Óscar Medina Solís", "Pachuca", 0, "", "pick"]].map(function (x) { return { name: x[0], from: x[1], air: !!x[2], eta: x[3], s: x[4], d: x[5] || 0 }; }) },
       photos: [["r-calle_noche.jpg", "Llegada y registro", "14:40"], ["r-escenario.jpg", "Ponencia · Dra. Mendoza (El Observatorio)", "16:10"], ["r-s360.jpg", "Ponencia · Dra. Abreu (El Arrecife)", "17:00"], ["r-booth.jpg", "Espacios y marca", "17:30"], ["r-dinamica.jpg", "Reto PULSO", "20:02"], ["r-cena.jpg", "Cena", "20:50"]].map(function (x, i) { return { id: "demo" + i, src: "assets/" + x[0], momento: x[1], caption: "Foto de ejemplo (render)", at: "2026-11-26T" + x[2] + ":00-06:00" }; }),
       video: "", updated: new Date().toISOString()
     };
@@ -57,6 +61,7 @@
     var f = d.figures || {}, a = V.ahora;
     $("vivo-ahora").innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:baseline"><div><div class="eyebrow">Llegaron</div><div style="font-weight:800;font-size:34px;color:var(--navy);line-height:1">' + fmt(f.asistentes) + '<span style="font-size:15px;color:var(--mute)"> de ' + fmt(f.confirmados) + ' confirmados</span></div></div>' +
       (a ? '<div style="flex:1;min-width:220px"><div class="eyebrow">En la Sala 360 desde las ' + esc(a.time) + '</div><div style="font-weight:800;font-size:17px;color:var(--navy)">' + esc(a.n) + '</div>' + (a.what && !/sin señal/i.test(a.what) ? '<div class="mute" style="font-weight:700">' + esc(a.what) + '</div>' : '') + '</div>' : '<div class="mute" style="font-weight:700">El programa arranca a las 16:00.</div>') + '</div>';
+    vivoExtra(V);
     var T = V.viajes || [];
     if (!T.length) { $("vivo-h").hidden = true; $("vivo-viajes").hidden = true; return; }
     var LBL = { prog: ["Programado", "gray"], air: ["En vuelo", ""], delay: ["Retrasado", "warn"], land: ["Aterrizó", ""], pick: ["Con el chofer", ""], done: ["Entregado", ""], here: ["Ya está en PULSO", ""] };
@@ -67,8 +72,71 @@
     }).join("");
   }
 
+  // ─── En vivo: lo que va a pasar (equipo), correo a ganadores con visto bueno, montaje con fotos y agenda ───
+  var THUMB = {}, WINAT = "", tick = null;
+  function hoyMin() { var d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })); return { dia: d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(), m: d.getHours() * 60 + d.getMinutes() }; }
+  function toM(t) { var m = String(t || "").match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : -1; }
+  function okKey() { return "pulso.ok." + WINAT; }
+  function yaOk() { try { return localStorage.getItem(okKey()) === "1"; } catch (e) { return false; } }
+  function act(a) { if (!demo && !NT) call({ action: "reportAct", k: key, act: a }).catch(function () {}); }
+  function vivoExtra(V) {
+    // Agenda con «Ahora» y «Sigue»
+    var A = V.agenda || [], h = hoyMin(), dia = h.dia === "2026-11-26", cur = -1;
+    if (dia) A.forEach(function (x, i) { var m = toM(x[0]); if (m >= 0 && m <= h.m) cur = i; });
+    $("vivo-agenda").innerHTML = A.map(function (x, i) {
+      var past = dia && i < cur, now = i === cur, next = dia && i === cur + 1;
+      return '<div style="display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);' + (past ? "opacity:.5;" : "") + (now ? "background:rgba(73,230,255,.10);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:12px;" : "") + '"><b style="min-width:46px;color:var(--navy)">' + esc(x[0]) + '</b><div style="flex:1;min-width:0"><div style="font-weight:800;color:var(--navy)">' + esc(x[1]) + '</div><div class="mute" style="font-size:13px;font-weight:700">' + esc(x[2]) + "</div></div>" + (now ? '<span class="chip">Ahora</span>' : next ? '<span class="chip gray">Sigue</span>' : "") + "</div>";
+    }).join("");
+    // Lo que va a pasar (solo equipo a cargo)
+    var H = V.hitos || [];
+    $("vivo-hh").hidden = $("vivo-hitos").hidden = !H.length;
+    var ICO = { ok: '<span style="color:#1f9e6a;font-weight:800">✓</span>', now: '<span style="color:var(--mag);font-weight:800">●</span>', next: '<span class="mute" style="font-weight:800">○</span>' };
+    $("vivo-hitos").innerHTML = H.map(function (x) {
+      var extra = "";
+      if (x.montaje) extra = '<div style="margin-top:8px;display:grid;gap:6px">' + x.montaje.map(function (z) {
+        return '<div style="display:flex;gap:10px;align-items:center;font-size:13.5px"><span style="width:16px">' + (z.ok ? ICO.ok : ICO.next) + '</span><div style="flex:1;min-width:0"><b style="color:var(--navy)">' + esc(z.item) + '</b><div class="mute" style="font-size:12px;font-weight:700">' + (z.ok ? "Lista " + esc(z.at) + " · " + esc(z.por) : "Lista a las " + esc(z.hora)) + "</div></div>" +
+          (z.fotos || []).map(function (id) { return '<button type="button" data-ph="' + esc(id) + '" data-cap="' + esc(z.item) + ' · ' + esc(z.at) + '" style="width:46px;height:46px;border-radius:10px;border:1px solid var(--line);background:#dfe7f3 center/cover no-repeat;cursor:pointer' + (THUMB[id] ? ';background-image:url(' + THUMB[id] + ')' : "") + '"></button>'; }).join("") + "</div>";
+      }).join("") + "</div>";
+      if (x.ver === "ganadores" && !x.at) extra = '<div class="btns" style="margin-top:6px"><button class="btn sm ghost" type="button" data-img="correo-ganador" data-cap="Correo de felicitación a cada ganador (machote)" data-act="verGanadores">Ver el correo</button></div>';
+      if (x.ver === "constancia") extra = '<div class="btns" style="margin-top:6px"><button class="btn sm ghost" type="button" data-img="constancia-muestra" data-cap="Constancia (machote con nombre de ejemplo)" data-act="verCorreo">Ver la constancia</button></div>';
+      return '<div style="padding:12px 0;border-bottom:1px solid var(--line)"><div style="display:flex;gap:10px;align-items:baseline"><span style="width:16px">' + (ICO[x.s] || ICO.next) + '</span><div style="flex:1"><div style="font-weight:800;color:var(--navy)">' + esc(x.t) + '</div><div class="mute" style="font-size:13px;font-weight:700">' + esc(x.d) + "</div>" + extra + "</div></div></div>";
+    }).join("");
+    // Fotos del montaje
+    H.forEach(function (x) { (x.montaje || []).forEach(function (z) { (z.fotos || []).forEach(function (id) { if (THUMB[id] || demo) return; THUMB[id] = "pending"; call({ action: "photo", k: key, id: id, w: 300 }).then(function (r) { if (r && r.success) { THUMB[id] = "data:" + r.mime + ";base64," + r.data; var b = document.querySelector('[data-ph="' + id + '"]'); if (b) b.style.backgroundImage = "url(" + THUMB[id] + ")"; } }).catch(function () { delete THUMB[id]; }); }); }); });
+    // Correo a ganadores a punto de salir: cuenta regresiva, ver y visto bueno
+    var W = H.filter(function (x) { return x.at; })[0];
+    clearInterval(tick);
+    if (!W) { $("vivo-win").innerHTML = ""; return; }
+    WINAT = W.at;
+    var ok = W.ok || [], mine = yaOk();
+    $("vivo-win").innerHTML = '<div class="glass" style="padding:18px;margin-bottom:14px;border:2px solid var(--mag)"><div class="eyebrow" style="color:var(--mag)">● Reto PULSO · a punto de salir</div>' +
+      '<div style="font-weight:800;font-size:20px;color:var(--navy);margin:4px 0 2px">El correo a los ganadores sale en <span id="win-cd">—</span></div><div class="mute" style="font-weight:700;font-size:13.5px">Hora de envío: ' + esc(new Date(W.at).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false })) + ' h</div>' +
+      '<div style="margin:12px 0">' + (W.win || []).map(function (w) { return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line)"><b style="color:var(--navy)">' + w.place + ".º · " + esc(w.name) + '</b><span class="mute" style="font-weight:700">' + fmt(w.pts) + " pts</span></div>"; }).join("") + "</div>" +
+      '<div class="btns"><button class="btn sm ghost" type="button" data-img="correo-ganador" data-cap="Así es el correo que recibirá cada ganador (machote)" data-act="verGanadores">Ver el correo</button>' +
+      (mine ? '<span class="chip">✓ Diste tu visto bueno</span>' : '<button class="btn sm" type="button" id="win-ok">Dar visto bueno</button>') + "</div>" +
+      (ok.length ? '<div class="mute" style="font-size:12.5px;font-weight:700;margin-top:10px">Visto bueno de: ' + ok.map(function (o) { return esc(o.name) + " (" + esc(o.time) + ")"; }).join(", ") + "</div>" : "") +
+      '<div class="mute" style="font-size:12px;font-weight:600;margin-top:8px">Solo es para que lo vean y lo aprueben; el envío lo hace producción.</div></div>';
+    function cd() { var s = Math.max(0, Math.round((Date.parse(W.at) - Date.now()) / 1000)); var e = $("win-cd"); if (e) e.textContent = s ? Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) + " min" : "este momento"; }
+    cd(); tick = setInterval(cd, 1000);
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-act]"); if (a) act(a.dataset.act);
+    var p = e.target.closest("[data-ph]"); if (p && THUMB[p.dataset.ph] && THUMB[p.dataset.ph] !== "pending") openImg(THUMB[p.dataset.ph], p.dataset.cap);
+    if (e.target.id === "win-ok") {
+      e.target.disabled = true; e.target.textContent = "Guardando…";
+      if (demo) { try { localStorage.setItem(okKey(), "1"); } catch (x) {} e.target.outerHTML = '<span class="chip">✓ Diste tu visto bueno</span>'; return; }
+      call({ action: "reportAct", k: key, act: "okGanadores" }).then(function (r) { if (r && r.success) { try { localStorage.setItem(okKey(), "1"); } catch (x) {} e.target.outerHTML = '<span class="chip">✓ Diste tu visto bueno</span>'; } else { e.target.disabled = false; e.target.textContent = (r && r.message) || "Intenta de nuevo"; } }).catch(function () { e.target.disabled = false; e.target.textContent = "Sin conexión · reintentar"; });
+    }
+  });
+
   function render(d) {
     vivo(d);
+    // El equipo en vivo y montaje verificado (al cierre)
+    var S = d.seguimiento, M = d.montaje || [];
+    if (S && S.personas && !d.vivo) $("com-vivo").innerHTML = '<div class="glass" style="padding:16px 18px;margin-top:14px"><div class="eyebrow">La cadena, en vivo</div><div style="display:flex;flex-wrap:wrap;gap:22px;margin:8px 0">' +
+      [[S.personas, "personas siguieron el evento en su liga"], [S.visitas, "visitas durante el día"], [S.aprobaciones, "dieron visto bueno a los correos antes de salir"]].map(function (k) { return '<div><div style="font-weight:800;font-size:28px;color:var(--navy);line-height:1">' + fmt(k[0]) + '</div><div class="mute" style="font-size:12.5px;font-weight:700;max-width:150px">' + k[1] + "</div></div>"; }).join("") + "</div>" +
+      ((S.nombres || []).length ? '<div class="mute" style="font-size:12.5px;font-weight:700;line-height:1.6">' + S.nombres.map(function (x) { return esc(x.name) + " · desde las " + esc(x.first); }).join("<br>") + "</div>" : "") + "</div>";
+    if (M.length) $("fot-montaje").innerHTML = '<div class="glass" style="padding:14px 18px;margin-bottom:14px"><div class="eyebrow">Montaje verificado con fotos de testigo</div>' + M.map(function (z) { return '<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><b style="color:var(--navy)">✓ ' + esc(z.item) + '</b><span class="mute" style="font-size:12.5px;font-weight:700">' + esc(z.at) + " · " + esc(z.por) + " · " + (z.fotos || []).length + " foto" + ((z.fotos || []).length === 1 ? "" : "s") + "</span></div>"; }).join("") + "</div>";
     var f = d.figures || {};
     var who = d.who || {};
     if (who.name) { $("para-nombre").textContent = who.name; document.title = "PULSO by Lacteol · Reporte final para " + who.name; }
@@ -272,9 +340,9 @@
   }
 
   if (demo) { $("demo").hidden = false; $("load").remove(); render(demoData()); return; }
-  call({ action: "reportData", k: key }).then(function (d) {
+  call({ action: "reportData", k: key, nt: NT }).then(function (d) {
     if (!d || !d.success) return fail(d && d.message ? d.message : "La liga no es válida.");
     $("load").remove(); render(d);
-    if (d.vivo) setInterval(function () { if (document.hidden) return; call({ action: "reportData", k: key }).then(function (n) { if (n && n.success) { vivo(n); if (!n.vivo) location.reload(); } }).catch(function () {}); }, 60000);
+    if (d.vivo) setInterval(function () { if (document.hidden) return; call({ action: "reportData", k: key, nt: NT }).then(function (n) { if (n && n.success) { vivo(n); if (!n.vivo) location.reload(); } }).catch(function () {}); }, 60000);
   }).catch(function () { fail("No hubo conexión con el servidor. Revise su internet e intente de nuevo."); });
 })();

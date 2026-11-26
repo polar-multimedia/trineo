@@ -5,6 +5,7 @@
   var qs = new URLSearchParams(location.search);
   var key = (qs.get("c") || "").replace(/[^a-z0-9-]/gi, "").slice(0, 24);
   var demo = !key || key === "prueba" || qs.has("demo");
+  var NT = qs.has("nt") ? 1 : 0;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var fmt = function (n) { return Number(n || 0).toLocaleString("es-MX"); };
@@ -18,12 +19,28 @@
 
   function demoData() {
     var x = [["Ana Sofía Ramírez Ortega", "Pediatría", 1, 4720, 1, 1], ["Luis Fernando Castillo Mora", "Gastroenterología pediátrica", 1, 3560, 5, 0], ["Daniela Torres Villa", "Pediatría", 1, 2980, 14, 0], ["Ricardo Salinas Peña", "Pediatría", 1, 0, 0, 0], ["Paola Andrea Núñez Cruz", "Neonatología", 0, 0, 0, 0], ["Héctor Iván Ruiz Gómez", "", 0, 0, 0, 0, 1]];
-    return { success: true, demo: true, rep: "Representante de ejemplo", open: true, jugadores: 112,
+    return { success: true, demo: true, rep: "Representante de ejemplo", open: true, jugadores: 112, updated: new Date().toISOString(),
+      vivo: { ahora: { n: "El Arrecife · Dra. Ana Teresa Abreu y Abreu", time: "16:55" }, agenda: [["14:00", "Registro y bienvenida", "Check-in con QR en la entrada"], ["14:30", "Comida", "Terraza"], ["16:00", "El Observatorio · Dra. María José Mendoza Tavera", "Diarrea aguda en pediatría"], ["19:55", "Reto PULSO", "Cinco casos clínicos en tiempo real"], ["20:40", "Cena", "Salen las constancias por correo"], ["22:40", "Cierre", "Aquí mismo verá sus resultados"]] },
       doctors: x.map(function (d, i) { return { id: d[6] ? "" : "DEMO" + i, name: d[0], specialty: d[1], checkedIn: !!d[2], certReady: !!d[2], certSent: !!d[2], played: d[3] > 0, pts: d[3], place: d[4], winner: d[5], pending: !!d[6] }; }) };
   }
 
+  function toM(t) { var m = String(t || "").match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : -1; }
+  function vivo(d) {
+    var V = d.vivo, sec = $("s-vivo"); if (!V) { sec.hidden = true; return; }
+    sec.hidden = false; sec.classList.add("in");
+    var docs = d.doctors || [], came = docs.filter(function (x) { return x.checkedIn; }).length, a = V.ahora;
+    $("vivo-sub").textContent = "Actualizado a las " + new Date(d.updated || Date.now()).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false }) + " h · se actualiza sola cada minuto. Al cierre, aquí mismo verá sus resultados y constancias.";
+    $("vivo-ahora").innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:baseline"><div><div class="eyebrow">De sus médicos ya llegaron</div><div style="font-weight:800;font-size:34px;color:var(--navy);line-height:1">' + fmt(came) + '<span style="font-size:15px;color:var(--mute)"> de ' + fmt(docs.length) + "</span></div></div>" +
+      (a ? '<div style="flex:1;min-width:200px"><div class="eyebrow">En la Sala 360 desde las ' + esc(a.time) + '</div><div style="font-weight:800;font-size:17px;color:var(--navy)">' + esc(a.n) + "</div></div>" : "") + "</div>";
+    var A = V.agenda || [], h = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })), dia = h.getFullYear() === 2026 && h.getMonth() === 10 && h.getDate() === 26, nm = h.getHours() * 60 + h.getMinutes(), cur = -1;
+    if (dia) A.forEach(function (x, i) { var m = toM(x[0]); if (m >= 0 && m <= nm) cur = i; });
+    $("vivo-agenda").innerHTML = '<div class="eyebrow" style="padding-top:12px">Agenda de hoy</div>' + A.map(function (x, i) {
+      var now = i === cur, next = dia && i === cur + 1;
+      return '<div style="display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);' + (dia && i < cur ? "opacity:.5;" : "") + (now ? "background:rgba(73,230,255,.10);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:12px;" : "") + '"><b style="min-width:46px;color:var(--navy)">' + esc(x[0]) + '</b><div style="flex:1;min-width:0"><div style="font-weight:800;color:var(--navy)">' + esc(x[1]) + '</div><div class="mute" style="font-size:13px;font-weight:700">' + esc(x[2]) + "</div></div>" + (now ? '<span class="chip">Ahora</span>' : next ? '<span class="chip gray">Sigue</span>' : "") + "</div>";
+    }).join("");
+  }
   function render(d) {
-    D = d;
+    D = d; vivo(d);
     $("para-nombre").textContent = d.rep || "Representante Carnot";
     document.title = "PULSO · Resultados de " + (d.rep || "sus médicos");
     var now = new Date(); $("h-upd").textContent = "Datos al " + now.toLocaleDateString("es-MX", { day: "numeric", month: "long" }) + ", " + now.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false }) + " h";
@@ -69,8 +86,9 @@
     document.querySelector("main").innerHTML = '<section class="sheet err"><h2>No pudimos abrir sus resultados</h2><p>' + esc(msg) + '</p><p class="mute">Escríbanos a <a href="mailto:pulso@polarmultimedia.com">pulso@polarmultimedia.com</a> y le mandamos su liga de nuevo.</p></section>';
   }
   if (demo) { $("demo").hidden = false; $("load").remove(); render(demoData()); return; }
-  call({ action: "repList", k: key }).then(function (d) {
+  call({ action: "repList", k: key, nt: NT }).then(function (d) {
     if (!d || !d.success) return fail(d && d.message ? d.message : "La liga no es válida.");
     $("load").remove(); render(d);
+    if (d.vivo) setInterval(function () { if (document.hidden) return; call({ action: "repList", k: key, nt: NT }).then(function (n) { if (n && n.success) render(n); }).catch(function () {}); }, 60000);
   }).catch(function () { fail("No hubo conexión con el servidor. Revise su internet e intente de nuevo."); });
 })();
