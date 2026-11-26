@@ -13,7 +13,7 @@
 
   function call(body) {
     return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); });
+      .then(function (r) { return r.text(); }).then(function (t) { return JSON.parse(t.replace(/CONAPM/g, "CONAPEME")); });
   }
 
   // ─── Datos de ejemplo para ?c=prueba ───

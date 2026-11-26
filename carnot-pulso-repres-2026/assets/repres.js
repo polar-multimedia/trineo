@@ -12,7 +12,7 @@
   var D = null, filter = "todos";
 
   function call(body) {
-    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) }).then(function (r) { return r.text(); }).then(function (t) { return JSON.parse(t.replace(/CONAPM/g, "CONAPEME")); });
   }
   function toast(t) { var e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove("on"); }, 3200); }
   function titleName(n) { return String(n || "").replace(/^(dr|dra|doctor|doctora)\.?\s+/i, ""); }
