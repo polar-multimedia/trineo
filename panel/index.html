@@ -151,10 +151,10 @@ const link = c => `${root}${current}/?c=${c}`;
 function ficha() {
   const q = COTIZACIONES[current];
   $("f-cliente").textContent = `${q.cliente} · ${q.proyecto}`;
-  $("f-monto").textContent = `${money(q.monto)} + IVA`;
+  $("f-monto").textContent = q.monto ? `${money(q.monto)} + IVA` : (q.tipo || "Entregable");
   $("f-nota").textContent = q.nota || "";
   $("b-open").href = `${root}${current}/?nt=1`;
-  $("b-pdf").href = `${root}${current}/${q.pdf}`;
+  $("b-pdf").hidden = !q.pdf; if (q.pdf) $("b-pdf").href = `${root}${current}/${q.pdf}`;
   if (!$("prev").hidden) $("frame").src = `${root}${current}/?nt=1`;
 }
 $("b-prev").onclick = () => { const p = $("prev"); p.hidden = !p.hidden; $("b-prev").textContent = p.hidden ? "Mostrar vista previa" : "Ocultar vista previa"; if (!p.hidden) $("frame").src = `${root}${current}/?nt=1`; };
@@ -187,7 +187,7 @@ function render() {
   const feed = [], secCount = secNames.map(() => 0);
   let opened = 0, tOpens = 0, tDl = 0, tSecs = 0, lastAct = 0;
   const rows = codes.map(c => {
-    const known = q.codigos.includes(c), d = DIR[c] || {};
+    const known = q.codigos.includes(c) || (!q.codigos.length && c !== "sin-codigo"), d = DIR[c] || {};
     const name = d.name || (known ? `Código ${c}` : c === "sin-codigo" ? "Link sin código" : `Código ${c} (no registrado)`);
     const v = Object.values(visits[c] || {}), dls = Object.values(downloads[c] || {});
     const secs = v.reduce((a, x) => a + (Number(x.secs) || 0), 0);
@@ -206,7 +206,7 @@ function render() {
   lastRows = rows;
   $("pcount").textContent = `· ${rows.length} ${rows.length === 1 ? "liga" : "ligas"}`;
   const N = q.codigos.length;
-  $("k1").innerHTML = `${opened}<small> de ${N}</small>`; $("k2").textContent = tOpens; $("k3").textContent = tDl;
+  $("k1").innerHTML = N ? `${opened}<small> de ${N}</small>` : `${opened}`; $("k2").textContent = tOpens; $("k3").textContent = tDl;
   $("k4").textContent = mins(tSecs); $("k5").textContent = lastAct ? ago(lastAct).replace("hace ", "") : "—";
   if (q.limite) { const dd = Math.ceil((new Date(q.limite + "T23:59:59") - Date.now()) / 864e5); $("k6").innerHTML = dd >= 0 ? `${dd}<small> días</small>` : "Vencida"; $("k6l").textContent = `para la fecha límite (${new Date(q.limite + "T12:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" })})`; }
 
