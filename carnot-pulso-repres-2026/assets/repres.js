@@ -48,7 +48,7 @@
     var came = docs.filter(function (x) { return x.checkedIn; }).length, played = docs.filter(function (x) { return x.played; }).length,
       wins = docs.filter(function (x) { return x.winner; }).length, certs = docs.filter(function (x) { return x.certReady; }).length;
     var pct = docs.length ? Math.round(came / docs.length * 100) : 0;
-    var K = [[came, "de sus médicos asistieron", "hi"], [pct, "de asistencia", "", "%"], [docs.length, "médicos en su lista"], [played, "jugaron el Reto PULSO"], [certs, "constancias listas"], [wins, wins === 1 ? "ganó beca para CONAPM 2027" : "ganaron beca para CONAPM 2027"]];
+    var K = [[came, "de sus médicos asistieron", "hi"], [pct, "de asistencia", "", "%"], [docs.length, "médicos en su lista"], [played, "jugaron el Reto PULSO"], [certs, "constancias listas"], [wins, wins === 1 ? "ganó beca para CONAPEME 2027" : "ganaron beca para CONAPEME 2027"]];
     $("kpis").innerHTML = K.map(function (k, i) { return '<div class="glass kpi ' + (k[2] || "") + '"><div class="n">' + fmt(k[0]) + (k[3] || "") + '</div><div class="l">' + esc(k[1]) + "</div>" + (i === 1 ? '<div class="meter"><i style="width:' + pct + '%"></i></div>' : "") + "</div>"; }).join("");
     $("sum-sub").textContent = wins ? "¡Felicidades! Uno de sus médicos está entre los ganadores del Reto PULSO." : "Médicos que usted invitó y confirmó para el evento.";
     if (wins > 1) $("sum-sub").textContent = "¡Felicidades! " + wins + " de sus médicos están entre los ganadores del Reto PULSO.";
